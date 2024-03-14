@@ -48,6 +48,9 @@ function displaySearchResults(contacts) {
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.innerHTML = ''; // Clear previous results
 
+    // Debugging line: Check if the noResultsMessage element is correctly identified
+    console.log('Debugging - noResultsMessage:', document.getElementById('noResultsMessage'));
+
     // Check if there are no contacts and display the noResultsMessage if so
     const noResultsMessage = document.getElementById('noResultsMessage');
     if (contacts.length === 0) {
