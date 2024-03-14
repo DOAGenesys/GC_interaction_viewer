@@ -48,16 +48,21 @@ function displaySearchResults(contacts) {
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.innerHTML = ''; // Clear previous results
 
-    // Debugging line: Check if the noResultsMessage element is correctly identified
-    console.log('Debugging - noResultsMessage:', document.getElementById('noResultsMessage'));
+    // Dynamically create the noResultsMessage element
+    let noResultsMessage = document.getElementById('noResultsMessage');
+    if (!noResultsMessage) {
+        noResultsMessage = document.createElement('div');
+        noResultsMessage.id = 'noResultsMessage';
+        noResultsMessage.style.display = 'none'; // Hide it by default
+        noResultsMessage.textContent = 'No results found.';
+        resultsSection.appendChild(noResultsMessage);
+    }
 
     // Check if there are no contacts and display the noResultsMessage if so
-    const noResultsMessage = document.getElementById('noResultsMessage');
     if (contacts.length === 0) {
         noResultsMessage.style.display = 'block'; // Show no results message
     } else {
         noResultsMessage.style.display = 'none'; // Hide no results message
-
         // Iterate through the contacts and create list items for each
         contacts.forEach(contact => {
             const li = document.createElement('li');
