@@ -133,6 +133,41 @@ table tbody tr:hover {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
+.contact-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.contact-name {
+    flex-grow: 2;
+    margin-right: 10px;
+}
+
+.contact-phone {
+    flex-grow: 1;
+    margin-right: 10px;
+    text-align: right;
+}
+
+.dialButton {
+    margin-right: 10px;
+    background-color: #5cb85c; /* Bootstrap 'btn-success' color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease;
+}
+
+.dialButton:hover {
+    background-color: #4cae4c; /* Darken on hover */
+}
+
 .removeButton {
     padding: 5px 15px;
     background-color: #d9534f; /* Bootstrap 'btn-danger' color */
