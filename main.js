@@ -11,6 +11,25 @@ document.addEventListener('DOMContentLoaded', function () {
     start();
 });
 
+function getConfig() {
+    return fetch('/api/getConfig')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Environment vars could not be retrieved');
+            }
+            return response.json();
+        });
+}
+
+async function start() {
+    try {
+        const config = await getConfig();
+        startGCSDKs(config.clientId);
+    } catch (error) {
+        console.error('Error occurred while starting:', error);
+    }
+}
+
 // Search function triggered by the search button
 async function searchExternalContacts() {
     const searchText = document.getElementById('searchTextbox').value;
