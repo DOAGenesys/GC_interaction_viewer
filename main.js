@@ -104,9 +104,24 @@ function updateSpeedDialUI() {
     speedDialList.innerHTML = ''; // Clear existing entries
 
     // Iterate through the speed dials and add them to the list
-    speedDials.forEach(contact => {
+    speedDials.forEach((contact, index) => {
         const li = document.createElement('li');
         li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
+        
+        // Create a remove button for each contact
+        const removeButton = document.createElement('button');
+        removeButton.textContent = 'Remove';
+        removeButton.onclick = () => removeFromSpeedDials(index);
+        removeButton.style.marginLeft = '10px'; // Add some spacing
+        removeButton.className = 'removeButton'; // Add class for styling
+
+        li.appendChild(removeButton);
         speedDialList.appendChild(li);
     });
+}
+
+// Function to remove a contact from the speed dials list
+function removeFromSpeedDials(index) {
+    speedDials.splice(index, 1); // Remove the contact from the array
+    updateSpeedDialUI(); // Update the UI to reflect the change
 }
