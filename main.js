@@ -17,8 +17,8 @@ async function searchExternalContacts() {
     try {
         // Update the API call with search text and default paging options
         const data = await externalContactsApi.getExternalcontactsContacts({
-            pageSize: 20,
-            pageNumber: 10,
+            pageSize: 10,
+            pageNumber: 1,
             q: searchText
         });
 
