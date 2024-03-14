@@ -27,20 +27,35 @@ async function start() {
 }
 
 async function fetchAndDisplayFavoritedContacts() {
-    try {
-        const data = await externalContactsApi.getExternalcontactsContacts({
-            pageSize: 10, 
-            pageNumber: 1
-        });
+    let pageNumber = 1;
+    let pageCount = 0;
+    do {
+        try {
+            // Make an API call to fetch a page of contacts
+            const data = await externalContactsApi.getExternalcontactsContacts({
+                pageSize: 500, 
+                pageNumber: pageNumber
+            });
 
-        const favoritedContacts = data.entities.filter(contact => contact.customFields && contact.customFields.isFavorite === true);
-        
-        // Display the favorited contacts in the speed dial section
-        favoritedContacts.forEach(contact => addToSpeedDials(contact, true));
-        updateSpeedDialUI();
-    } catch (err) {
-        console.error('Error fetching favorited contacts:', err);
-    }
+            // Update pageCount from the API response
+            pageCount = data.pageCount;
+
+            // Filter favorited contacts and add them to speed dials
+            const favoritedContacts = data.entities.filter(contact => 
+                contact.customFields && contact.customFields.isFavorite === true
+            );
+            favoritedContacts.forEach(contact => addToSpeedDials(contact, true));
+
+            // Increment pageNumber to fetch the next page in the next iteration
+            pageNumber++;
+        } catch (err) {
+            console.error('Error fetching favorited contacts:', err);
+            break;
+        }
+    } while (pageNumber <= pageCount); // Continue until all pages have been processed
+
+    // Once all pages have been processed and favorited contacts added, update the UI
+    updateSpeedDialUI();
 }
 
 // Search function triggered by the search button
