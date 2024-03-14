@@ -20,8 +20,26 @@ async function start() {
     try {
         const config = await getConfig();
         startGCSDKs(config.clientId);
+        fetchAndDisplayFavoritedContacts();
     } catch (error) {
         console.error('Error occurred while starting:', error);
+    }
+}
+
+async function fetchAndDisplayFavoritedContacts() {
+    try {
+        const data = await externalContactsApi.getExternalcontactsContacts({
+            pageSize: 10, 
+            pageNumber: 1
+        });
+
+        const favoritedContacts = data.entities.filter(contact => contact.customFields && contact.customFields.isFavorite === true);
+        
+        // Display the favorited contacts in the speed dial section
+        favoritedContacts.forEach(contact => addToSpeedDials(contact, true));
+        updateSpeedDialUI();
+    } catch (err) {
+        console.error('Error fetching favorited contacts:', err);
     }
 }
 
