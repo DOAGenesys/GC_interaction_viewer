@@ -34,19 +34,27 @@ function displaySearchResults(contacts) {
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.innerHTML = ''; // Clear previous results
 
-    // Iterate through the contacts and create list items for each
-    contacts.forEach(contact => {
-        const li = document.createElement('li');
-        li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
+    // Check if there are no contacts and display the noResultsMessage if so
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    if (contacts.length === 0) {
+        noResultsMessage.style.display = 'block'; // Show no results message
+    } else {
+        noResultsMessage.style.display = 'none'; // Hide no results message
 
-        // Add a favorite button for each contact
-        const favButton = document.createElement('button');
-        favButton.textContent = 'Favorite';
-        favButton.onclick = () => addToSpeedDials(contact);
-        li.appendChild(favButton);
+        // Iterate through the contacts and create list items for each
+        contacts.forEach(contact => {
+            const li = document.createElement('li');
+            li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
+            
+            // Add a favorite button for each contact
+            const favButton = document.createElement('button');
+            favButton.textContent = 'Favorite';
+            favButton.onclick = () => addToSpeedDials(contact);
+            li.appendChild(favButton);
 
-        resultsSection.appendChild(li);
-    });
+            resultsSection.appendChild(li);
+        });
+    }
 }
 
 // Function to add a contact to the speed dials list
