@@ -106,7 +106,7 @@ function displaySearchResults(contacts) {
             li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
 
             const favButton = document.createElement('button');
-            favButton.textContent = 'Favorite';
+            favButton.textContent = 'Favourite';
             favButton.onclick = () => addToSpeedDials(contact);
             li.appendChild(favButton);
 
