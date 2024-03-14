@@ -133,6 +133,21 @@ table tbody tr:hover {
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
+.removeButton {
+    padding: 5px 15px;
+    background-color: #d9534f; /* Bootstrap 'btn-danger' color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.removeButton:hover {
+    background-color: #c9302c; /* Darken on hover */
+}
+
+
 /* Responsive design adjustments */
 @media screen and (max-width: 768px) {
     #searchTextbox {
