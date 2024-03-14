@@ -34,7 +34,6 @@
             async function start() {
                 try {
                     const config = await getConfig();
-                    console.log('clientId: ', config.clientId);
                     startGCSDKs(config.clientId);
                 } catch (error) {
                     console.error('Error occurred while starting:', error);
