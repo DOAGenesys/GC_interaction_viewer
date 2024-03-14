@@ -154,7 +154,7 @@ table tbody tr:hover {
 
 .dialButton {
     margin-right: 10px;
-    background-color: #5cb85c; /* Bootstrap 'btn-success' color */
+    background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
