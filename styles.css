@@ -1,3 +1,6 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+
 /* Base reset and box-sizing definitions */
 * {
     margin: 0;
@@ -13,10 +16,10 @@
 
 /* Base body styles */
 body {
-    font-family: 'Helvetica', sans-serif;
+    font-family: 'Open Sans', sans-serif; /* Updated font family */
     background-color: #f8f8f8;
     color: #333;
-    line-height: 1.5;
+    line-height: 1.6; /* Slightly increased line height for readability */
     animation: fadeIn 1s ease;
 }
 
@@ -43,20 +46,22 @@ body {
     padding: 10px;
     border: 2px solid #ddd;
     border-radius: 5px;
+    font-size: 1rem; /* Ensured font size is explicitly set for clarity */
 }
 
 #searchButton {
     padding: 10px 20px;
-    background-color: #333;
+    background-color: #0056b3; /* Brighter primary color for more vibrance */
     color: #fff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-weight: 600; /* Make button text slightly bolder */
 }
 
 #searchButton:hover {
-    background-color: #444;
+    background-color: #003d82; /* A darker shade for hover state */
 }
 
 /* List styling for results and speed dials */
@@ -87,6 +92,7 @@ body {
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-weight: 600; /* Bolder button text */
 }
 
 #resultsSection li button:hover, #speedDialList li button:hover {
@@ -95,6 +101,7 @@ body {
 
 /* Header and table styles */
 h1, h3 {
+    font-weight: 600; /* Slightly bolder headers for distinction */
     text-align: center;
     margin-bottom: 20px;
     animation: fadeIn 2s ease;
