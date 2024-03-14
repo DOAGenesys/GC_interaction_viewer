@@ -33,7 +33,7 @@ async function fetchAndDisplayFavoritedContacts() {
         try {
             // Make an API call to fetch a page of contacts
             const data = await externalContactsApi.getExternalcontactsContacts({
-                pageSize: 500, 
+                pageSize: 100, 
                 pageNumber: pageNumber
             });
 
