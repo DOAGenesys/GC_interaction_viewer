@@ -139,17 +139,48 @@ function updateSpeedDialUI() {
 
     speedDials.forEach((contact, index) => {
         const li = document.createElement('li');
-        li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
+        li.className = 'contact-item'; 
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'contact-name';
+        nameSpan.textContent = `${contact.firstName} ${contact.lastName}`;
+        
+        const phoneSpan = document.createElement('span');
+        phoneSpan.className = 'contact-phone';
+        phoneSpan.textContent = contact.workPhone ? contact.workPhone.e164 : 'N/A';
+        
+        li.appendChild(nameSpan);
+        li.appendChild(phoneSpan);
+
+        const dialButton = document.createElement('button');
+        dialButton.className = 'dialButton';
+        dialButton.innerHTML = '&#128222;'; // HTML entity for a phone icon
+        dialButton.onclick = () => dialContact(contact.workPhone.e164);
+        li.appendChild(dialButton);
 
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
-        removeButton.onclick = () => removeFromSpeedDials(index);
-        removeButton.style.marginLeft = '10px';
         removeButton.className = 'removeButton';
-
+        removeButton.onclick = () => removeFromSpeedDials(index);
         li.appendChild(removeButton);
+
         speedDialList.appendChild(li);
     });
+}
+
+// Function to dial a contact
+function dialContact(phoneNumber) {
+    const body = { phoneNumber: phoneNumber, sessionType: 'softphone' };
+    
+    const apiInstance = new platformClient.ConversationsApi();
+    apiInstance.postConversationsCalls(body)
+      .then((data) => {
+        console.log(`postConversationsCalls success! data: ${JSON.stringify(data, null, 2)}`);
+      })
+      .catch((err) => {
+        console.log('There was a failure calling postConversationsCalls');
+        console.error(err);
+      });
 }
 
 // Function to remove a contact from the speed dials list and update the backend
