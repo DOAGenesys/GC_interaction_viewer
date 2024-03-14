@@ -36,8 +36,10 @@ async function searchExternalContacts() {
             q: searchText
         });
 
-        // Display the search results
+        // Display the search results and check for speed dial preferences
         displaySearchResults(data.entities);
+        // Update the speed dial UI in case new favorites were found
+        updateSpeedDialUI();
     } catch (err) {
         console.error('Error searching external contacts:', err);
     }
@@ -48,29 +50,30 @@ function displaySearchResults(contacts) {
     const resultsSection = document.getElementById('resultsSection');
     resultsSection.innerHTML = ''; // Clear previous results
 
-    // Dynamically create the noResultsMessage element
     let noResultsMessage = document.getElementById('noResultsMessage');
     if (!noResultsMessage) {
         noResultsMessage = document.createElement('div');
         noResultsMessage.id = 'noResultsMessage';
-        noResultsMessage.style.display = 'none'; // Hide it by default
+        noResultsMessage.style.display = 'none';
         noResultsMessage.textContent = 'No results found.';
         resultsSection.appendChild(noResultsMessage);
     }
 
-    // Check if there are no contacts and display the noResultsMessage if so
     if (contacts.length === 0) {
-        noResultsMessage.style.display = 'block'; // Show no results message
+        noResultsMessage.style.display = 'block';
     } else {
-        noResultsMessage.style.display = 'none'; // Hide no results message
-        // Iterate through the contacts and create list items for each
+        noResultsMessage.style.display = 'none';
         contacts.forEach(contact => {
+            // Automatically add contacts with speed_dial_checkbox set to true to favorites
+            if (contact.customFields && contact.customFields.speed_dial_checkbox === true) {
+                addToSpeedDials(contact, true); // Passing true to bypass checks
+            }
+
             const li = document.createElement('li');
             li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
-            
-            // Add a favourite button for each contact
+
             const favButton = document.createElement('button');
-            favButton.textContent = 'Favourite';
+            favButton.textContent = 'Favorite';
             favButton.onclick = () => addToSpeedDials(contact);
             li.appendChild(favButton);
 
@@ -80,40 +83,34 @@ function displaySearchResults(contacts) {
 }
 
 // Function to add a contact to the speed dials list
-function addToSpeedDials(contact) {
-    // Ensure the speed dial does not exceed 10 contacts
-    if (speedDials.length >= 10) {
+function addToSpeedDials(contact, skipCheck = false) {
+    if (speedDials.length >= 10 && !skipCheck) {
         alert('Speed dial list can only contain up to 10 contacts.');
         return;
     }
 
-    // Check if the contact is already in the speed dials
-    if (speedDials.find(dial => dial.id === contact.id)) {
+    if (speedDials.find(dial => dial.id === contact.id) && !skipCheck) {
         alert('This contact is already in your speed dial list.');
         return;
     }
 
-    // Add the contact to the speed dial list and update the UI
     speedDials.push(contact);
-    updateSpeedDialUI();
 }
 
 // Function to update the speed dial section in the UI
 function updateSpeedDialUI() {
     const speedDialList = document.getElementById('speedDialList');
-    speedDialList.innerHTML = ''; // Clear existing entries
+    speedDialList.innerHTML = '';
 
-    // Iterate through the speed dials and add them to the list
     speedDials.forEach((contact, index) => {
         const li = document.createElement('li');
         li.textContent = `${contact.firstName} ${contact.lastName} - ${contact.workPhone ? contact.workPhone.e164 : 'N/A'}`;
-        
-        // Create a remove button for each contact
+
         const removeButton = document.createElement('button');
         removeButton.textContent = 'Remove';
         removeButton.onclick = () => removeFromSpeedDials(index);
-        removeButton.style.marginLeft = '10px'; // Add some spacing
-        removeButton.className = 'removeButton'; // Add class for styling
+        removeButton.style.marginLeft = '10px';
+        removeButton.className = 'removeButton';
 
         li.appendChild(removeButton);
         speedDialList.appendChild(li);
@@ -122,6 +119,6 @@ function updateSpeedDialUI() {
 
 // Function to remove a contact from the speed dials list
 function removeFromSpeedDials(index) {
-    speedDials.splice(index, 1); // Remove the contact from the array
-    updateSpeedDialUI(); // Update the UI to reflect the change
+    speedDials.splice(index, 1);
+    updateSpeedDialUI();
 }
