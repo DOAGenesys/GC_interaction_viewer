@@ -6,11 +6,6 @@ const platformClient = require('platformClient');
 const client = platformClient.ApiClient.instance;
 const externalContactsApi = new platformClient.ExternalContactsApi();
 
-// Get environment configuration and start SDKs
-document.addEventListener('DOMContentLoaded', function () {
-    start();
-});
-
 function getConfig() {
     return fetch('/api/getConfig')
         .then(response => {
