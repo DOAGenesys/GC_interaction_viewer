@@ -115,8 +115,8 @@ function displaySearchResults(contacts) {
     }
 }
 
-// Function to add a contact to the speed dials list
-function addToSpeedDials(contact, skipCheck = false) {
+// Function to add a contact to the speed dials list and update the backend
+async function addToSpeedDials(contact, skipCheck = false) {
     if (speedDials.length >= 10 && !skipCheck) {
         alert('Speed dial list can only contain up to 10 contacts.');
         return;
@@ -127,7 +127,28 @@ function addToSpeedDials(contact, skipCheck = false) {
         return;
     }
 
-    // Store the entire contact object
+    // Check if we need to update the backend for this contact
+    if (contact.customFields && contact.customFields['speed_dial_checkbox'] !== true) {
+        // Prepare the payload with speed_dial_checkbox set to true
+        const updatedContact = {
+            ...contact,
+            customFields: {
+                ...contact.customFields,
+                'speed_dial_checkbox': true
+            }
+        };
+
+        try {
+            // Make an API call to update the contact's speed_dial_checkbox to true
+            await externalContactsApi.putExternalcontactsContact(contact.id, updatedContact);
+            console.log(`Successfully updated contact: ${contact.id}`);
+        } catch (err) {
+            console.error(`Error updating contact: ${contact.id}`, err);
+            return; // Exit if the update fails
+        }
+    }
+
+    // Add the contact to the local speedDials array and update the UI
     speedDials.push(contact);
     updateSpeedDialUI();
 }
