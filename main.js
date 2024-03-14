@@ -127,7 +127,9 @@ function addToSpeedDials(contact, skipCheck = false) {
         return;
     }
 
+    // Store the entire contact object
     speedDials.push(contact);
+    updateSpeedDialUI();
 }
 
 // Function to update the speed dial section in the UI
@@ -150,8 +152,29 @@ function updateSpeedDialUI() {
     });
 }
 
-// Function to remove a contact from the speed dials list
-function removeFromSpeedDials(index) {
+// Function to remove a contact from the speed dials list and update the backend
+async function removeFromSpeedDials(index) {
+    const contact = speedDials[index];
+    if (!contact) return;
+
+    // Prepare the updated payload with speed_dial_checkbox set to false
+    const updatedContact = {
+        ...contact,
+        customFields: {
+            ...contact.customFields,
+            speed_dial_checkbox: false
+        }
+    };
+
+    try {
+        // Update the contact's speed_dial_checkbox to false
+        await externalContactsApi.putExternalcontactsContact(contact.id, updatedContact);
+        console.log(`Successfully updated contact: ${contact.id}`);
+    } catch (err) {
+        console.error(`Error updating contact: ${contact.id}`, err);
+    }
+
+    // Remove the contact from the speedDials array and update the UI
     speedDials.splice(index, 1);
     updateSpeedDialUI();
 }
