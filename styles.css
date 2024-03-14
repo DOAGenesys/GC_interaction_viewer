@@ -1,151 +1,138 @@
-/* Animaciones */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* Efectos 3D */
-.threed {
-  transform-style: preserve-3d;
-  transition: all 0.5s;
-}
-
-.threed:hover {
-  transform: rotateX(10deg) rotateY(10deg);
-}
-
-/* Estilos */
+/* Base reset and box-sizing definitions */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* Base animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Base body styles */
 body {
-  font-family: 'Helvetica', sans-serif;
-  background-color: #f8f8f8;
-  color: #333;
-  line-height: 1.5;
+    font-family: 'Helvetica', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    line-height: 1.5;
+    animation: fadeIn 1s ease;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  padding: 2rem 0;
-  background-color: #333;
-  color: #fff;
+/* Search and sections styling */
+#searchSection, #resultsSection, #speedDialSection {
+    margin: 2rem auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    animation: fadeIn 1.5s ease-out;
 }
 
-button {
-  display: block;
-  font-size: 1rem;
-  padding: 0.5rem 1rem;
-  margin: 1rem auto;
-  background-color: #333;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  animation: fadeIn 1s ease;
-  perspective: 1000px;
+#searchSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
 }
 
-button:hover {
-  background-color: #444;
-  transform: translateY(-3px);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+#searchTextbox {
+    width: 70%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 5px;
 }
 
-.threed {
-  display: inline-block;
-  position: relative;
+#searchButton {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
-.threed:hover .back {
-  transform: rotateY(0deg);
+#searchButton:hover {
+    background-color: #444;
 }
 
-.threed:hover .front {
-  transform: rotateY(-180deg);
+/* List styling for results and speed dials */
+#resultsSection ul, #speedDialList {
+    list-style-type: none;
 }
 
-.threed .back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  transform: rotateY(180deg);
+#resultsSection li, #speedDialList li {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    animation: fadeIn 2s ease-out;
+    transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.threed .front {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
+#resultsSection li:hover, #speedDialList li:hover {
+    background-color: #f0f0f0;
+    transform: translateX(10px);
+}
+
+#resultsSection li button, #speedDialList li button {
+    float: right;
+    padding: 5px 15px;
+    margin-left: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#resultsSection li button:hover, #speedDialList li button:hover {
+    background-color: #0056b3;
+}
+
+/* Header and table styles */
+h1, h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeIn 2s ease;
 }
 
 table {
-  width: 80%;
-  margin: 2rem auto;
-  border-collapse: collapse;
-  perspective: 1000px;
+    width: 80%;
+    margin: 2rem auto;
+    border-collapse: collapse;
 }
 
 table thead {
-  background-color: #333;
-  color: #fff;
+    background-color: #333;
+    color: #fff;
 }
 
-table th,
-table td {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
+table th, table td {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
 }
 
 table tbody tr:nth-child(odd) {
-  background-color: #eee;
+    background-color: #eee;
 }
 
 table tbody tr:hover {
-  background-color: #ddd;
-  transform: translateY(-3px);
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+    background-color: #ddd;
+    transform: translateY(-3px);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
-th,
-td {
-  padding: 0.5rem;
-  text-align: center;
-  font-size: 1.2rem;
-}
-
-th:first-child,
-td:first-child {
-  width: 20%;
-}
-
+/* Responsive design adjustments */
 @media screen and (max-width: 768px) {
-  table {
-    font-size: 0.8rem;
-  }
-  
-  th,
-  td {
-    padding: 0.2rem;
-    font-size: 1rem;
-  }
+    #searchTextbox {
+        width: 60%;
+    }
 
-  th:first-child,
-  td:first-child {
-    width: 30%;
-  }
+    table, th, td {
+        font-size: 0.8rem;
+    }
 }
