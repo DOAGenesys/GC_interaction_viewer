@@ -1,35 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Custom transfers</title>
+    <title>External Contact Search and Speed Dial</title>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
     <script src="startGCSDKs.js"></script>
-    <script src="transfers.js"></script>
+    <script src="main.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body id="body" style="display: none;">
-    <div id="transferTypeSelection">
-        <button id="blindTransferButton" onclick="startBlindTransfer()">Blind Transfer</button>
-        <button id="consultTransferButton" onclick="startConsultTransfer()">Consult Transfer</button>
+<body>
+    <div id="searchSection">
+        <input type="text" id="searchTextbox" placeholder="Search external contacts...">
+        <button id="searchButton" onclick="searchExternalContacts()">Search</button>
     </div>
     
-    <div id="blindTransferElements" style="display: none;">
-        <select id="queueSelectBlind"></select>
-        <button id="confirmBlindTransferButton" onclick="blindTransfer()">Confirm</button>
-    </div>
+    <div id="resultsSection"></div>
 
-    <div id="consultTransferElements" style="display: none;">
-        <select id="speakToSelect"></select>
-        <select id="queueSelectConsult"></select>
-        <!-- Removed the confirmConsultTransferButton here -->
+    <div id="speedDialSection">
+        <h3>Speed Dials</h3>
+        <ul id="speedDialList"></ul>
     </div>
-
     <script>
-        const clientId = '4b980e28-662c-4bca-9b81-09d80bc304a3';
-        document.addEventListener('DOMContentLoaded', function () {
-          startGCSDKs(clientId);
-        });
+        function getConfig() {
+                return fetch('/api/getConfig')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Environment vars could not be retrieved');
+                        }
+                        return response.json();
+                    });
+            }
+        
+        function setWindowConfig(config) {
+            Object.keys(config).forEach(key => {
+                window[key] = config[key];
+                console.log(`window.${key} =`, window[key]);
+            });
+        }
+
+            async function start() {
+                try {
+                    await getConfig()
+                    const config = await getConfig();
+                    setWindowConfig(config);
+                    startGCSDKs();
+                } catch (error) {
+                    console.error('Error occurred while starting:', error);
+                }
+            }
+        
+            start();
     </script>
 </body>
-</html>
