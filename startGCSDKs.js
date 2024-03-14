@@ -5,12 +5,10 @@ function startGCSDKs(clientId) {
         const qParamLanguage = 'langTag';
         const qParamGcHostOrigin = 'gcHostOrigin';
         const qParamEnvironment = 'gcTargetEnv';
-        const qParamConversationId = 'conversationId';
         let language = '';  
         let redirectUri = 'https://gc-speed-dial.vercel.app';
         let userDetails = null;
         let gcHostOrigin = '';
-        let conversationId = '';
         assignConfiguration();
 
         const hostName = new URL(gcHostOrigin).hostname;
@@ -63,14 +61,6 @@ function startGCSDKs(clientId) {
             console.log('browser_url: ', browser_url);
             console.log('searchParams: ', searchParams);
             
-            if (searchParams.has(qParamConversationId)) {
-                conversationId = searchParams.get(qParamConversationId);
-                window.conversationId = conversationId; 
-                console.log('Conversation ID set from URL parameter:', conversationId);
-            } else {
-                console.log('Conversation ID not found in URL parameters.');
-            }
-
             if (searchParams.has(qParamLanguage)) {
                 language = searchParams.get(qParamLanguage);
                 localStorage.setItem(`${appName}_language`, language);
