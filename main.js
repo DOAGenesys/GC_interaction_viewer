@@ -41,8 +41,8 @@ async function fetchAndDisplayFavoritedContacts() {
             pageCount = data.pageCount;
 
             // Filter favorited contacts and add them to speed dials
-            const favoritedContacts = data.entities.filter(contact => 
-                contact.customFields && contact.customFields.isFavorite === true
+            const favoritedContacts = data.entities.filter(contact =>
+                contact.customFields && contact.customFields['speed_dial_checkbox'] === true
             );
             favoritedContacts.forEach(contact => addToSpeedDials(contact, true));
 
