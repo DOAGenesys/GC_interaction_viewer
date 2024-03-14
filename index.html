@@ -4,8 +4,6 @@
     <title>External Contact Search and Speed Dial</title>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
-    <script src="startGCSDKs.js"></script>
-    <script src="main.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,9 +12,7 @@
         <button id="searchButton" onclick="searchExternalContacts()">Search</button>
     </div>
     
-    <div id="resultsSection">
-        <div id="noResultsMessage" style="display: none;">No results found.</div>
-    </div>
+    <div id="resultsSection"></div>
     
     <div id="resultInfo" style="margin-top: 10px;">
         Showing up to 10 results.
@@ -26,9 +22,12 @@
         <h3>Speed Dials</h3>
         <ul id="speedDialList"></ul>
     </div>
+    <script src="startGCSDKs.js"></script>
+    <script src="main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             start();
         });
     </script>
 </body>
+</html>
