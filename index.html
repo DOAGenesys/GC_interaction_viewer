@@ -31,19 +31,11 @@
                     });
             }
         
-        function setWindowConfig(config) {
-            Object.keys(config).forEach(key => {
-                window[key] = config[key];
-                console.log(`window.${key} =`, window[key]);
-            });
-        }
-
             async function start() {
                 try {
-                    await getConfig()
                     const config = await getConfig();
-                    setWindowConfig(config);
-                    startGCSDKs();
+                    console.log('clientId: ', config.clientId);
+                    startGCSDKs(config.clientId);
                 } catch (error) {
                     console.error('Error occurred while starting:', error);
                 }
