@@ -14,12 +14,20 @@
         <button id="searchButton" onclick="searchExternalContacts()">Search</button>
     </div>
     
-    <div id="resultsSection"></div>
+    <div id="resultsSection">
+        <div id="noResultsMessage" style="display: none;">No results found.</div>
+    </div>
+    
+    <div id="resultInfo" style="margin-top: 10px;">
+        Showing up to 10 results.
+    </div>
 
     <div id="speedDialSection">
         <h3>Speed Dials</h3>
         <ul id="speedDialList"></ul>
     </div>
+
+    
     <script>
         function getConfig() {
                 return fetch('/api/getConfig')
