@@ -1,32 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>External Contact Search and Speed Dial</title>
+    <title>ROTA - Vet Dialer</title>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="searchSection">
-        <input type="text" id="searchTextbox" placeholder="Search external contacts...">
-        <button id="searchButton" onclick="searchExternalContacts()">Search</button>
-    </div>
-    
-    <div id="resultsSection"></div>
-    
-    <div id="resultInfo" style="margin-top: 10px;">
+    <div class="container">
+        <h2>Callback Details</h2>
+        <div class="info-section">
+            <div class="form-group">
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" readonly>
+            </div>
+            <div class="form-group">
+                <label for="destinationNumber">Destination Number:</label>
+                <input type="text" id="destinationNumber" readonly>
+            </div>
+        </div>
+        <div class="button-section">
+            <button id="dialButton" onclick="dialNumber()">Dial</button>
+        </div>
     </div>
 
-    <div id="speedDialSection">
-        <h3>Speed Dials</h3>
-        <ul id="speedDialList"></ul>
-    </div>
     <script src="startGCSDKs.js"></script>
+    <script src="conversationHandler.js"></script>
     <script src="main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            start();
-        });
-    </script>
 </body>
 </html>
