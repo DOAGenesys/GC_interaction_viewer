@@ -24,6 +24,7 @@ async function updateUI(customerName, destinationDetails) {
 
 async function dialNumber() {
     const destinationNumber = document.getElementById('destinationNumber').value;
+    const destinationName = document.getElementById('destinationName').value;
     if (!destinationNumber) {
         alert('No destination number available');
         return;
@@ -54,11 +55,11 @@ async function initialize() {
         // Get conversation details
         const conversationDetails = await window.conversationHandler.getConversationDetails(conversationId);
         
-        // Get destination number
-        const destinationNumber = await window.conversationHandler.getDestinationNumber(config);
+        // Get destination details
+        const destinationDetails = await window.conversationHandler.getDestinationNumber(config);
 
         // Update UI
-        updateUI(conversationDetails.customerName, destinationNumber);
+        updateUI(conversationDetails.customerName, destinationDetails);
     } catch (error) {
         console.error('Initialization error:', error);
         alert('Failed to initialize application: ' + error.message);
