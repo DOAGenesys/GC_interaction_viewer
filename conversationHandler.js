@@ -47,7 +47,10 @@ window.conversationHandler = (function() {
             }
 
             const data = await response.json();
-            return data.destinationDetails.contactNumber;
+            return {
+                name: data.destinationDetails.name,
+                contactNumber: data.destinationDetails.contactNumber
+            };
         } catch (error) {
             console.error('Error fetching destination number:', error);
             throw error;
