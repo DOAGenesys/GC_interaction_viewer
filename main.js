@@ -15,10 +15,11 @@ function getConversationId() {
     return urlParams.get('conversationId');
 }
 
-async function updateUI(customerName, destinationNumber) {
+async function updateUI(customerName, destinationDetails) {
     document.getElementById('customerName').value = customerName || '';
-    document.getElementById('destinationNumber').value = destinationNumber || '';
-    document.getElementById('dialButton').disabled = !destinationNumber;
+    document.getElementById('destinationName').value = destinationDetails?.name || '';
+    document.getElementById('destinationNumber').value = destinationDetails?.contactNumber || '';
+    document.getElementById('dialButton').disabled = !destinationDetails?.contactNumber;
 }
 
 async function dialNumber() {
