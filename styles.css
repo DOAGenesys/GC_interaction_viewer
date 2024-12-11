@@ -1,195 +1,75 @@
-/* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
-
-/* Base reset and box-sizing definitions */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Base animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-/* Base body styles */
 body {
-    font-family: 'Open Sans', sans-serif; /* Updated font family */
-    background-color: #f8f8f8;
-    color: #333;
-    line-height: 1.6; /* Slightly increased line height for readability */
-    animation: fadeIn 1s ease;
-}
-
-/* Search and sections styling */
-#searchSection, #resultsSection, #speedDialSection {
-    margin: 2rem auto;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-    animation: fadeIn 1.5s ease-out;
-}
-
-#searchSection {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-family: 'Open Sans', sans-serif;
+    margin: 0;
     padding: 20px;
+    background-color: #f5f5f5;
 }
 
-#searchTextbox {
-    width: 70%;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem; /* Ensured font size is explicitly set for clarity */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-#searchButton {
-    padding: 10px 20px;
-    background-color: #0056b3; /* Brighter primary color for more vibrance */
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-weight: 600; /* Make button text slightly bolder */
+h2 {
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
-#searchButton:hover {
-    background-color: #003d82; /* A darker shade for hover state */
+.info-section {
+    margin-bottom: 20px;
 }
 
-/* List styling for results and speed dials */
-#resultsSection ul, #speedDialList {
-    list-style-type: none;
+.form-group {
+    margin-bottom: 15px;
 }
 
-#resultsSection li, #speedDialList li {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-    position: relative;
-    animation: fadeIn 2s ease-out;
-    transition: background-color 0.3s ease, transform 0.3s ease;
+label {
+    display: block;
+    margin-bottom: 5px;
+    color: #666;
+    font-weight: bold;
 }
 
-#resultsSection li:hover, #speedDialList li:hover {
-    background-color: #f0f0f0;
-    transform: translateX(10px);
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #f9f9f9;
 }
 
-#resultsSection li button, #speedDialList li button {
-    float: right;
-    padding: 5px 15px;
-    margin-left: 15px;
-    border: none;
-    border-radius: 5px;
+input[readonly] {
+    background-color: #eee;
+    cursor: not-allowed;
+}
+
+.button-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+button {
     background-color: #007bff;
     color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-weight: 600; /* Bolder button text */
+    font-size: 16px;
+    transition: background-color 0.3s;
 }
 
-#resultsSection li button:hover, #speedDialList li button:hover {
+button:hover {
     background-color: #0056b3;
 }
 
-/* Header and table styles */
-h1, h3 {
-    font-weight: 600; /* Slightly bolder headers for distinction */
-    text-align: center;
-    margin-bottom: 20px;
-    animation: fadeIn 2s ease;
-}
-
-table {
-    width: 80%;
-    margin: 2rem auto;
-    border-collapse: collapse;
-}
-
-table thead {
-    background-color: #333;
-    color: #fff;
-}
-
-table th, table td {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ddd;
-}
-
-table tbody tr:nth-child(odd) {
-    background-color: #eee;
-}
-
-table tbody tr:hover {
-    background-color: #ddd;
-    transform: translateY(-3px);
-    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-.contact-name {
-    flex-grow: 2;
-    margin-right: 10px;
-}
-
-.contact-phone {
-    flex-grow: 1;
-    margin-right: 10px;
-    text-align: right;
-}
-
-.dialButton {
-    margin-right: 10px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: background-color 0.3s ease;
-}
-
-.dialButton:hover {
-    background-color: #4cae4c; /* Darken on hover */
-}
-
-.removeButton {
-    padding: 5px 15px;
-    background-color: #d9534f; /* Bootstrap 'btn-danger' color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.removeButton:hover {
-    background-color: #c9302c; /* Darken on hover */
-}
-
-
-/* Responsive design adjustments */
-@media screen and (max-width: 768px) {
-    #searchTextbox {
-        width: 60%;
-    }
-
-    table, th, td {
-        font-size: 0.8rem;
-    }
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
 }
