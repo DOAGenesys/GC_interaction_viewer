@@ -1,4 +1,6 @@
 window.conversationHandler = (function() {
+    console.log("TAS Vet ROTA Dialer - Initializing conversation handler module");
+    
     const platformClient = require('platformClient');
     let conversationApi = new platformClient.ConversationsApi();
     let storedData = {
@@ -8,19 +10,25 @@ window.conversationHandler = (function() {
     };
 
     async function getConversationDetails(conversationId) {
+        console.log("TAS Vet ROTA Dialer - Fetching conversation details for ID:", conversationId);
         try {
+            console.log("TAS Vet ROTA Dialer - Making API call to get conversation callback details");
             const data = await conversationApi.getConversationsCallback(conversationId);
+            console.log("TAS Vet ROTA Dialer - Retrieved conversation data:", JSON.stringify(data, null, 2));
             
-            // Find customer participant
             const customerParticipant = data.participants.find(p => p.purpose === 'customer');
             if (!customerParticipant) {
+                console.error("TAS Vet ROTA Dialer - No customer participant found in conversation data");
                 throw new Error('No customer participant found');
             }
 
-            // Store necessary data
+            console.log("TAS Vet ROTA Dialer - Found customer participant:", JSON.stringify(customerParticipant, null, 2));
+
             storedData.externalContactId = customerParticipant.externalContact?.id;
             storedData.queueId = customerParticipant.queue?.id;
             storedData.customerName = customerParticipant.name;
+
+            console.log("TAS Vet ROTA Dialer - Stored conversation data:", JSON.stringify(storedData, null, 2));
 
             return {
                 customerName: customerParticipant.name,
@@ -28,17 +36,19 @@ window.conversationHandler = (function() {
                 queueId: customerParticipant.queue?.id
             };
         } catch (error) {
-            console.error('Error fetching conversation details:', error);
+            console.error("TAS Vet ROTA Dialer - Error fetching conversation details:", error);
             throw error;
         }
     }
 
     async function getDestinationNumber(config) {
+        console.log("TAS Vet ROTA Dialer - Starting destination number fetch");
         try {
-
             const currentDateTime = new Date().toISOString().split('.')[0] + 'Z';
+            console.log("TAS Vet ROTA Dialer - Using datetime:", currentDateTime);
         
             const url = `${config.awsApiEndpoint}/active-vet?datetime=${currentDateTime}`;
+            console.log("TAS Vet ROTA Dialer - Making API call to:", url);
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -49,29 +59,39 @@ window.conversationHandler = (function() {
             });
     
             if (!response.ok) {
+                console.error("TAS Vet ROTA Dialer - API call failed with status:", response.status);
                 throw new Error(`API call failed: ${response.status}`);
             }
     
             const data = await response.json();
+            console.log("TAS Vet ROTA Dialer - API response:", JSON.stringify(data, null, 2));
             
             if (!data.tableMatch) {
+                console.warn("TAS Vet ROTA Dialer - No active vet found for the current time");
                 return {
                     name: '',
                     contactNumber: ''
                 };
             }
     
+            console.log("TAS Vet ROTA Dialer - Successfully retrieved destination details");
             return {
                 name: data.destinationDetails.name,
                 contactNumber: data.destinationDetails.contactNumber
             };
         } catch (error) {
-            console.error('Error fetching destination number:', error);
+            console.error("TAS Vet ROTA Dialer - Error fetching destination number:", error);
             throw error;
         }
     }
 
     async function initiateCall(phoneNumber) {
+        console.log("TAS Vet ROTA Dialer - Initiating call with stored data:", {
+            customerName: storedData.customerName,
+            queueId: storedData.queueId,
+            externalContactId: storedData.externalContactId
+        });
+
         try {
             const body = {
                 phoneNumber: phoneNumber,
@@ -81,11 +101,12 @@ window.conversationHandler = (function() {
                 label: "generated via interaction widget"
             };
 
+            console.log("TAS Vet ROTA Dialer - Making API call to initiate call:", JSON.stringify(body, null, 2));
             const result = await conversationApi.postConversationsCalls(body);
-            console.log('Call initiated successfully:', result);
+            console.log("TAS Vet ROTA Dialer - Call initiated successfully:", JSON.stringify(result, null, 2));
             return result;
         } catch (error) {
-            console.error('Error initiating call:', error);
+            console.error("TAS Vet ROTA Dialer - Error initiating call:", error);
             throw error;
         }
     }
