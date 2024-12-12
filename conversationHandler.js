@@ -35,18 +35,32 @@ window.conversationHandler = (function() {
 
     async function getDestinationNumber(config) {
         try {
+
             const currentDateTime = new Date().toISOString().split('.')[0] + 'Z';
-            const response = await fetch(`${config.awsApiEndpoint}?datetime=${currentDateTime}`, {
+        
+            const url = `${config.awsApiEndpoint}/active-vet?datetime=${currentDateTime}`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
                 headers: {
-                    'x-api-key': config.awsApiKey
+                    'x-api-key': config.awsApiKey,
+                    'Content-Type': 'application/json'
                 }
             });
-
+    
             if (!response.ok) {
-                throw new Error('Failed to fetch destination number');
+                throw new Error(`API call failed: ${response.status}`);
             }
-
+    
             const data = await response.json();
+            
+            if (!data.tableMatch) {
+                return {
+                    name: '',
+                    contactNumber: ''
+                };
+            }
+    
             return {
                 name: data.destinationDetails.name,
                 contactNumber: data.destinationDetails.contactNumber
