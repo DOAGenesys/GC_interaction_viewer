@@ -95,20 +95,18 @@ window.conversationHandler = (function() {
 
     async function initiateCall(phoneNumber) {
         console.log("TAS Vet ROTA Dialer - Initiating call with stored data:", {
-            customerName: storedData.customerName,
             queueId: storedData.queueId,
             externalContactId: storedData.externalContactId
         });
-
+    
         try {
             const body = {
                 phoneNumber: phoneNumber,
-                callerIdName: storedData.customerName,
                 callFromQueueId: storedData.queueId,
                 externalContactId: storedData.externalContactId,
                 label: "generated via interaction widget"
             };
-
+    
             console.log("TAS Vet ROTA Dialer - Making API call to initiate call:", JSON.stringify(body, null, 2));
             const result = await conversationApi.postConversationsCalls(body);
             console.log("TAS Vet ROTA Dialer - Call initiated successfully:", JSON.stringify(result, null, 2));
