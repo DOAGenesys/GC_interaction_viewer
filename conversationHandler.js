@@ -47,24 +47,15 @@ window.conversationHandler = (function() {
             const currentDateTime = new Date().toISOString().split('.')[0] + 'Z';
             console.log("TAS Vet ROTA Dialer - Using datetime:", currentDateTime);
     
-            // Debug config
-            console.log("TAS Vet ROTA Dialer - Config check:", {
-                hasEndpoint: !!config.awsApiEndpoint,
-                hasApiKey: !!config.awsApiKey,
-                endpoint: config.awsApiEndpoint
-            });
-    
-            const url = `${config.awsApiEndpoint}/active-vet?datetime=${currentDateTime}`;
+            const url = `/api/getActiveVet?datetime=${currentDateTime}`;
             console.log("TAS Vet ROTA Dialer - Making API call to:", url);
     
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'x-api-key': config.awsApiKey || ''
+                    'Content-Type': 'application/json'
                 },
-                mode: 'cors',
                 cache: 'no-cache'
             });
     
