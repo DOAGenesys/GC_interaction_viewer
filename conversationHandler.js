@@ -46,26 +46,41 @@ window.conversationHandler = (function() {
         try {
             const currentDateTime = new Date().toISOString().split('.')[0] + 'Z';
             console.log("TAS Vet ROTA Dialer - Using datetime:", currentDateTime);
-        
+    
+            // Debug config
+            console.log("TAS Vet ROTA Dialer - Config check:", {
+                hasEndpoint: !!config.awsApiEndpoint,
+                hasApiKey: !!config.awsApiKey,
+                endpoint: config.awsApiEndpoint
+            });
+    
             const url = `${config.awsApiEndpoint}/active-vet?datetime=${currentDateTime}`;
             console.log("TAS Vet ROTA Dialer - Making API call to:", url);
-            
+    
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
-                    'x-api-key': config.awsApiKey,
-                    'Content-Type': 'application/json'
-                }
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'x-api-key': config.awsApiKey || ''
+                },
+                mode: 'cors',
+                cache: 'no-cache'
             });
     
             if (!response.ok) {
-                console.error("TAS Vet ROTA Dialer - API call failed with status:", response.status);
-                throw new Error(`API call failed: ${response.status}`);
+                const errorText = await response.text();
+                console.error("TAS Vet ROTA Dialer - API response error:", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    body: errorText
+                });
+                throw new Error(`API call failed: ${response.status} ${response.statusText}`);
             }
     
             const data = await response.json();
-            console.log("TAS Vet ROTA Dialer - API response:", JSON.stringify(data, null, 2));
-            
+            console.log("TAS Vet ROTA Dialer - API response success:", data);
+    
             if (!data.tableMatch) {
                 console.warn("TAS Vet ROTA Dialer - No active vet found for the current time");
                 return {
@@ -74,13 +89,15 @@ window.conversationHandler = (function() {
                 };
             }
     
-            console.log("TAS Vet ROTA Dialer - Successfully retrieved destination details");
             return {
                 name: data.destinationDetails.name,
                 contactNumber: data.destinationDetails.contactNumber
             };
         } catch (error) {
-            console.error("TAS Vet ROTA Dialer - Error fetching destination number:", error);
+            console.error("TAS Vet ROTA Dialer - Error fetching destination number:", {
+                error: error.message,
+                stack: error.stack
+            });
             throw error;
         }
     }
