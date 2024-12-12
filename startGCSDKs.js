@@ -6,7 +6,7 @@ function startGCSDKs(clientId) {
         const qParamGcHostOrigin = 'gcHostOrigin';
         const qParamEnvironment = 'gcTargetEnv';
         let language = '';  
-        let redirectUri = 'https://gc-speed-dial.vercel.app';
+        let redirectUri = 'https://gc-tas-vet-dial.vercel.app';
         let userDetails = null;
         let gcHostOrigin = '';
         assignConfiguration();
