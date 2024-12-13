@@ -57,7 +57,7 @@ This application is a Genesys Cloud widget that integrates with an AWS backend t
 sequenceDiagram
     participant UI as UI
     participant GC as Genesys Cloud
-    participant AWS as AWS
+    participant AWS API Gateway as AWS API Gateway
     
     rect rgb(40, 44, 52)
         UI->>+GC: Implicit Grant Authentication
@@ -71,7 +71,7 @@ sequenceDiagram
         Note over UI,GC: Using conversationId from URL
         GC->>-UI: Return conversation participants & queue info
         
-        UI->>+AWS Gateway: Fetch Active Vet Details
+        UI->>+AWS API Gateway: Fetch Active Vet Details
         Note over UI,AWS API Gateway: Using current datetime
         AWS API Gateway->>+Lambda: Invoke Lambda function
         Lambda->>+DynamoDB: Query table
