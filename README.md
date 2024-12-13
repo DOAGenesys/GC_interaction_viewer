@@ -33,15 +33,30 @@ This application is a Genesys Cloud widget that integrates with an AWS backend t
 
 ```mermaid
 sequenceDiagram
-    participant UI
+    participant UI as UI
     participant GC as Genesys Cloud
-    participant AWS
+    participant AWS as AWS
     
-    UI->>GC: Implicit Grant Authentication
-    UI->>GC: Get User Details (getUsersMe)
-    UI->>GC: Get Conversation Details
-    UI->>AWS: Fetch Active Vet Details
-    UI->>UI: Update Interface
+    %% Using bright colors and solid lines for better visibility
+    rect rgb(40, 44, 52)
+        UI->>+GC: Implicit Grant Authentication
+        Note over UI,GC: OAuth 2.0 flow begins
+        GC->>-UI: Return authentication token
+        
+        UI->>+GC: Get User Details (getUsersMe)
+        GC->>-UI: Return current user information
+        
+        UI->>+GC: Get Conversation Details
+        Note over UI,GC: Using conversationId from URL
+        GC->>-UI: Return conversation participants & queue info
+        
+        UI->>+AWS: Fetch Active Vet Details
+        Note over UI,AWS: Using current datetime
+        AWS->>-UI: Return on-call vet contact info
+        
+        UI->>UI: Update Interface
+        Note over UI: Populate form fields<br/>Enable/disable dial button
+    end
 ```
 
 ### 2. Genesys Cloud API Endpoints Used
