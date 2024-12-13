@@ -71,13 +71,13 @@ sequenceDiagram
         Note over UI,GC: Using conversationId from URL
         GC->>-UI: Return conversation participants & queue info
         
-        UI->>+AWS: Fetch Active Vet Details
-        Note over UI,AWS: Using current datetime
-        AWS->>+Lambda: Invoke Lambda function
+        UI->>+AWS Gateway: Fetch Active Vet Details
+        Note over UI,AWS API Gateway: Using current datetime
+        AWS API Gateway->>+Lambda: Invoke Lambda function
         Lambda->>+DynamoDB: Query table
         DynamoDB->>-Lambda: Return vet data
-        Lambda->>-AWS: Process and return data
-        AWS->>-UI: Return on-call vet contact info
+        Lambda->>-AWS API Gateway: Process and return data
+        AWS API Gateway->>-UI: Return on-call vet contact info
         
         UI->>UI: Update Interface
         Note over UI: Populate form fields<br/>Enable/disable dial button
