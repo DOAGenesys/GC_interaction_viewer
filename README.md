@@ -7,7 +7,7 @@ A Genesys Cloud integration widget that enables automated dialing to on-call vet
 ### Workflow
 When a callback interaction is initiated, the widget automatically:
 1. Retrieves the callback information, including customer data and the associated queue
-2. Queries the AWS table to determine the correct veterinarian to be contacted based on the current datetime
+2. Queries the AWS "GC_TAS_ROTA_Demo" dynamoDB table to determine the correct veterinarian to be contacted based on the current datetime
 3. Presents this information in the widget's user interface
 4. When an agent clicks the Dial button, it places an outbound call to the veterinarian on behalf of the queue used for the callback
 
@@ -16,23 +16,38 @@ This application is a Genesys Cloud widget that integrates with an AWS backend t
 ## Required Configuration
 
 ### Genesys Cloud Phone Settings
-- "Phone Settings" > "Placing calls with another app?" must be enabled
-- This setting is crucial for the application to function properly and initiate outbound calls
+- "Phone Settings" > "Placing calls with another app?" must be enabled in the GC UI
+
+### AWS Backend Configuration
+- A REST API endpoint must be deployed on AWS API Gateway
+- The API Gateway endpoint must be configured to invoke a Lambda function
+- The Lambda function should be set up to query the "GC_TAS_ROTA_Demo" DynamoDB table
+- The Lambda function should use appropriate IAM roles with permissions to:
+  - Read from the DynamoDB table
+  - Execute within the API Gateway context
+  - Access any necessary AWS resources
 
 ## Technical Architecture
 
 ### Components
 
 1. **Frontend Application**
-   - HTML5 web application
-   - Runs as a Genesys Cloud widget
-   - Integrates with Genesys Cloud JavaScript SDK
+   - Runs as a Genesys Cloud interaction widget
+   - Integrates with Genesys Cloud JavaScript and client app SDKs
    - Communicates with AWS backend via API endpoints
 
 2. **Backend Integration**
    - AWS API Gateway endpoints
+   - Lambda function for business logic
+   - DynamoDB table for data storage
    - Environment-based configuration
    - Secure API key authentication
+
+3. **AWS Lambda Function**
+   - Queries "GC_TAS_ROTA_Demo" DynamoDB table
+   - Processes datetime-based lookups
+   - Returns formatted veterinarian data
+   - Implements error handling and logging
 
 ## API Flows
 
@@ -44,7 +59,6 @@ sequenceDiagram
     participant GC as Genesys Cloud
     participant AWS as AWS
     
-    %% Using bright colors and solid lines for better visibility
     rect rgb(40, 44, 52)
         UI->>+GC: Implicit Grant Authentication
         Note over UI,GC: OAuth 2.0 flow begins
@@ -59,6 +73,10 @@ sequenceDiagram
         
         UI->>+AWS: Fetch Active Vet Details
         Note over UI,AWS: Using current datetime
+        AWS->>+Lambda: Invoke Lambda function
+        Lambda->>+DynamoDB: Query table
+        DynamoDB->>-Lambda: Return vet data
+        Lambda->>-AWS: Process and return data
         AWS->>-UI: Return on-call vet contact info
         
         UI->>UI: Update Interface
@@ -108,11 +126,18 @@ sequenceDiagram
 #### Get Active Vet
 - **Endpoint**: `GET /api/getActiveVet`
 - **Purpose**: Fetch current on-call veterinarian details
+- **Integration**: AWS Lambda function
+- **DynamoDB Table**: GC_TAS_ROTA_Demo
 - **Parameters**:
   - `datetime`: ISO timestamp
 - **Headers**:
   - `X-Api-Key`: AWS API authentication
   - `Content-Type`: application/json
+- **Lambda Function**:
+  - Queries DynamoDB based on current datetime
+  - Processes and formats veterinarian data
+  - Implements error handling
+  - Returns formatted response
 
 #### Get Configuration
 - **Endpoint**: `GET /api/getConfig`
@@ -134,7 +159,7 @@ sequenceDiagram
 
 2. **Data Gathering**
    - Fetch conversation details from Genesys Cloud
-   - Get current veterinarian details from AWS
+   - Get current veterinarian details from AWS Lambda via API Gateway
    - Update UI with gathered information
 
 3. **Call Initiation**
@@ -154,17 +179,22 @@ sequenceDiagram
 1. **API Authentication**
    - Genesys Cloud OAuth 2.0 Implicit Grant
    - AWS API Key authentication
+   - Lambda execution role permissions
+   - DynamoDB table access controls
    - Environment variable protection
 
 2. **Data Protection**
    - No sensitive data storage in localStorage
    - Minimal data persistence
    - Secure communication protocols
+   - Encrypted data transmission
 
 ## Error Handling
 
 The application implements comprehensive error handling:
 - API call failures
+- Lambda function errors
+- DynamoDB query issues
 - Missing conversation IDs
 - Invalid veterinarian data
 - Network connectivity issues
@@ -173,6 +203,8 @@ The application implements comprehensive error handling:
 
 Extensive logging is implemented throughout the application:
 - API call tracking
+- Lambda function execution logs
+- DynamoDB query monitoring
 - Error logging
 - User action logging
 - State changes
