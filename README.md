@@ -4,6 +4,13 @@ A Genesys Cloud integration widget that enables automated dialing to on-call vet
 
 ## Overview
 
+### Workflow
+When a callback interaction is initiated, the widget automatically:
+1. Retrieves the callback information, including customer data and the associated queue
+2. Queries the AWS table to determine the correct veterinarian to be contacted based on the current datetime
+3. Presents this information in the widget's user interface
+4. When an agent clicks the Dial button, it places an outbound call to the veterinarian on behalf of the queue used for the callback
+
 This application is a Genesys Cloud widget that integrates with an AWS backend to fetch active veterinarian details and facilitate direct dialing. It's designed to work within the Genesys Cloud interface, allowing agents to quickly connect customers with the currently on-call veterinarian.
 
 ## Required Configuration
