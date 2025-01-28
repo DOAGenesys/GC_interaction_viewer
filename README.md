@@ -23,7 +23,7 @@ The Genesys Cloud Interaction Viewer is a web application designed to provide a 
 
 Before running the Genesys Cloud Interaction Viewer, ensure you have the following prerequisites in place:
 
-1.  **Genesys Cloud Interaction Widget Integration:** Deploy this as an interaction widget pointing to "https://<your_domain>/?langTag={{gcLangTag}}&gcTargetEnv={{gcTargetEnv}}&gcHostOrigin={{gcHostOrigin}}&conversationId={{gcConversationId}}"
+1.  **Genesys Cloud Interaction Widget Integration:** Deploy this as an interaction widget pointing to `https://<your_domain>/?langTag={{gcLangTag}}&gcTargetEnv={{gcTargetEnv}}&gcHostOrigin={{gcHostOrigin}}&conversationId={{gcConversationId}}`
 2.  **Genesys Cloud OAuth Client:**
     *   You need to configure an OAuth Client in your Genesys Cloud organization with **Implicit Grant** type.
     *   Note the **Client ID** of this OAuth client, as it will be needed to configure the application.
