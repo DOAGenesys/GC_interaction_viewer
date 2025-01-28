@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>ROTA - Vet Dialer</title>
+    <title>Genesys Cloud Unattended Interaction Viewer</title>
     <script src="https://sdk-cdn.mypurecloud.com/javascript/latest/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h2>Call Details</h2>
+        <h2>Interaction Viewer</h2>
         <div class="info-section">
-            <div class="form-group">
-                <label for="customerName">Customer Name:</label>
-                <input type="text" id="customerName" readonly>
-            </div>
-            <div class="form-group">
-                <label for="destinationName">Destination Name:</label>
-                <input type="text" id="destinationName" readonly>
-            </div>
-            <div class="form-group">
-                <label for="destinationNumber">Destination Number:</label>
-                <input type="text" id="destinationNumber" readonly>
-            </div>
+            <p>Environment: <span id="span_environment"></span></p>
+            <p>User: <span id="span_name"></span></p>
         </div>
-        <div class="button-section">
-            <button id="dialButton" onclick="dialNumber()">Dial</button>
+
+        <div id="conversationHistory">
+            <h3>Conversation History</h3>
+            <div id="historyByType"></div>
         </div>
     </div>
 
     <script src="startGCSDKs.js"></script>
-    <script src="conversationHandler.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
