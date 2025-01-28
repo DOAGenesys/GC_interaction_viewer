@@ -221,7 +221,7 @@ async function displayConversationHistory(sessionsByType) {
                         const summaryContent = document.createElement('div');
                         summaryContent.classList.add('section-content');
                         summaryContent.innerHTML = '<p>Loading summary...</p>';
-                        summarySection.appendChild summaryContent;
+                        summarySection.appendChild(summaryContent);
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
