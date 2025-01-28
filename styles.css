@@ -52,6 +52,13 @@ h5 {
     font-size: 1.1em;
 }
 
+h6 {
+    color: #9fa8da;
+    margin-bottom: 8px;
+    font-weight: 500;
+    font-size: 1em;
+}
+
 
 #conversationHistory {
     margin-top: 20px;
@@ -155,4 +162,19 @@ h5 {
 .detail-section.collapsed .section-header {
     border-bottom: none;
     border-radius: 6px;
+}
+
+.topic-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.topic-tag {
+    background-color: #e8eaf6;
+    color: #3f51b5;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.85em;
 }
