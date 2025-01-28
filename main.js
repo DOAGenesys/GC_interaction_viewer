@@ -98,6 +98,21 @@ async function fetchConversationSummary(conversationId) {
     }
 }
 
+async function fetchConversationAnalytics(conversationId) {
+    console.log(`GC interaction viewer - Fetching conversation analytics for ${conversationId}`);
+    try {
+        const analyticsData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversation(conversationId);
+        return analyticsData;
+    } catch (error) {
+        if (error.status === 404) {
+            console.warn("Conversation analytics not found (404) for conversation:", conversationId);
+            return null;
+        }
+        console.error("GC interaction viewer - Failed to fetch conversation analytics:", error);
+        throw new Error('Failed to fetch conversation analytics: ' + error.message);
+    }
+}
+
 
 function processTranscript(transcriptJson, mediaType) {
     if (!transcriptJson || !transcriptJson.transcripts || transcriptJson.transcripts.length === 0) {
@@ -105,10 +120,6 @@ function processTranscript(transcriptJson, mediaType) {
     }
 
     let transcriptHTML = '';
-    let sentimentScore = 0;
-    let sentimentCount = 0;
-    let empathyScore = 0;
-    let empathyCount = 0;
     let topics = new Set();
 
     transcriptJson.transcripts.forEach(transcript => {
@@ -133,37 +144,14 @@ function processTranscript(transcriptJson, mediaType) {
             });
         }
 
-        if (transcript.analytics) {
-            if (transcript.analytics.sentiment) {
-                transcript.analytics.sentiment.forEach(s => {
-                    sentimentScore += s.sentiment;
-                    sentimentCount++;
-                });
-            }
-            if (transcript.analytics.empathy) {
-                transcript.analytics.empathy.forEach(e => {
-                    empathyScore += e.empathy;
-                    empathyCount++;
-                });
-            }
-            if (transcript.analytics.topics) {
-                transcript.analytics.topics.forEach(topic => {
-                    topics.add(topic.topicName);
-                });
-            }
+        if (transcript.analytics && transcript.analytics.topics) {
+            transcript.analytics.topics.forEach(topic => {
+                topics.add(topic.topicName);
+            });
         }
     });
 
     let analyticsHTML = '';
-    if (sentimentCount > 0) {
-        const avgSentiment = ((sentimentScore / sentimentCount) * 100).toFixed(2);
-        analyticsHTML += `<p><strong>Average Sentiment:</strong> ${avgSentiment}%</p>`;
-    }
-    if (empathyCount > 0) {
-        const avgEmpathy = ((empathyScore / empathyCount) * 100).toFixed(2);
-        analyticsHTML += `<p><strong>Average Empathy:</strong> ${avgEmpathy}%</p>`;
-    }
-
     if (topics.size > 0) {
         const topicsArray = Array.from(topics);
         const topicsTags = topicsArray.map(topic => `<span class="topic-tag">${topic}</span>`).join('');
@@ -174,9 +162,31 @@ function processTranscript(transcriptJson, mediaType) {
             </div>
         `;
     }
-
-
     return transcriptHTML + analyticsHTML;
+}
+
+
+function displayConversationAnalytics(analyticsData) {
+    let analyticsHTML = '';
+    if (analyticsData) {
+        if (analyticsData.sentimentScore !== undefined && analyticsData.sentimentTrend !== undefined) {
+            const sentimentScorePercentage = (analyticsData.sentimentScore * 100).toFixed(2);
+            const sentimentTrendPercentage = (analyticsData.sentimentTrend * 100).toFixed(2);
+            analyticsHTML += `
+                <p><strong>Sentiment Score:</strong> ${sentimentScorePercentage}%</p>
+                <p><strong>Sentiment Trend:</strong> ${sentimentTrendPercentage}%</p>
+            `;
+        }
+
+        if (analyticsData.empathyScores && analyticsData.empathyScores.length > 0) {
+            analyticsData.empathyScores.forEach(empathyScore => {
+                analyticsHTML += `<p><strong>Empathy Score (User ${empathyScore.userId}):</strong> ${empathyScore.score}%</p>`;
+            });
+        }
+    } else {
+        analyticsHTML = '<p>No analytics data available.</p>';
+    }
+    return analyticsHTML;
 }
 
 
@@ -230,7 +240,7 @@ async function displayConversationHistory(sessionsByType) {
                 const transcriptionSection = document.createElement('div');
                 transcriptionSection.classList.add('detail-section', 'collapsed');
                 const transcriptionHeader = document.createElement('h5');
-                transcriptionHeader.textContent = 'Transcription and Analytics';
+                transcriptionHeader.textContent = 'Transcription';
                 transcriptionHeader.classList.add('section-header');
                 transcriptionHeader.addEventListener('click', async () => {
                     transcriptionSection.classList.toggle('collapsed');
@@ -312,6 +322,39 @@ async function displayConversationHistory(sessionsByType) {
                 });
                 summarySection.appendChild(summaryHeader);
                 detailsDiv.appendChild(summarySection);
+
+
+                const analyticsSection = document.createElement('div');
+                analyticsSection.classList.add('detail-section', 'collapsed');
+                const analyticsHeader = document.createElement('h5');
+                analyticsHeader.textContent = 'Analytics';
+                analyticsHeader.classList.add('section-header');
+
+                analyticsHeader.addEventListener('click', async () => {
+                    analyticsSection.classList.toggle('collapsed');
+                    if (!analyticsSection.dataset.analyticsLoaded) {
+                        analyticsSection.dataset.analyticsLoaded = 'true';
+                        const analyticsContent = document.createElement('div');
+                        analyticsContent.classList.add('section-content');
+                        analyticsContent.innerHTML = '<p>Loading analytics...</p>';
+                        analyticsSection.appendChild(analyticsContent);
+
+                        try {
+                            const analyticsData = await fetchConversationAnalytics(session.id);
+                            if (analyticsData) {
+                                const analyticsDisplayHTML = displayConversationAnalytics(analyticsData);
+                                analyticsContent.innerHTML = analyticsDisplayHTML;
+                            } else {
+                                analyticsContent.innerHTML = '<p>No analytics data available.</p>';
+                            }
+                        } catch (error) {
+                            console.error("Error loading analytics:", error);
+                            analyticsContent.innerHTML = `<p>Error loading analytics: ${error.message}</p>`;
+                        }
+                    }
+                });
+                analyticsSection.appendChild(analyticsHeader);
+                detailsDiv.appendChild(analyticsSection);
 
 
                 sessionItem.appendChild(detailsDiv);
