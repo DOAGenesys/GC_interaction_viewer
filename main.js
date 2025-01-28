@@ -1,5 +1,8 @@
 let config = null;
 let platformClient = null;
+let conversationsApi = null;
+let journeyApi = null;
+let speechTextAnalyticsApi = null;
 
 async function getConfig() {
     console.log("Interaction Viewer - Fetching configuration from /api/getConfig");
@@ -22,52 +25,69 @@ function getConversationId() {
 
 async function fetchConversationDetails(conversationId) {
     console.log(`Interaction Viewer - Fetching conversation details for ${conversationId}`);
-    const response = await fetch(`/api/getConversationDetails?conversationId=${conversationId}`);
-    if (!response.ok) {
-        console.error("Interaction Viewer - Failed to fetch conversation details, status:", response.status);
-        throw new Error('Failed to fetch conversation details');
+    try {
+        const conversationDetails = await conversationsApi.getAnalyticsConversationDetails(conversationId);
+        return conversationDetails;
+    } catch (error) {
+        console.error("Interaction Viewer - Failed to fetch conversation details:", error);
+        throw new Error('Failed to fetch conversation details: ' + error.message);
     }
-    return response.json();
 }
 
 async function fetchExternalContactSessions(contactId) {
     console.log(`Interaction Viewer - Fetching external contact sessions for ${contactId}`);
-    const response = await fetch(`/api/getExternalContactSessions?contactId=${contactId}`);
-    if (!response.ok) {
-        console.error("Interaction Viewer - Failed to fetch external contact sessions, status:", response.status);
-        throw new Error('Failed to fetch external contact sessions');
+    const opts = {
+        'pageSize': '200' // Maximum page size
+    };
+    try {
+        const sessionsData = await journeyApi.getExternalcontactsContactJourneySessions(contactId, opts);
+        return sessionsData;
+    } catch (error) {
+        console.error("Interaction Viewer - Failed to fetch external contact sessions:", error);
+        throw new Error('Failed to fetch external contact sessions: ' + error.message);
     }
-    return response.json();
 }
 
 async function fetchTranscriptUrl(conversationId, communicationId) {
     console.log(`Interaction Viewer - Fetching transcript URL for conversation ${conversationId}, communication ${communicationId}`);
-    const response = await fetch(`/api/getTranscriptUrl?conversationId=${conversationId}&communicationId=${communicationId}`);
-    if (!response.ok) {
-        console.error("Interaction Viewer - Failed to fetch transcript URL, status:", response.status);
-        throw new Error('Failed to fetch transcript URL');
+    try {
+        const transcriptUrlData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl(conversationId, communicationId);
+        return transcriptUrlData;
+    } catch (error) {
+        console.error("Interaction Viewer - Failed to fetch transcript URL:", error);
+        throw new Error('Failed to fetch transcript URL: ' + error.message);
     }
-    return response.json();
 }
 
 async function fetchTranscriptData(transcriptUrl) {
-    console.log(`Interaction Viewer - Fetching transcript data from URL`);
-    const response = await fetch(transcriptUrl.url);
-    if (!response.ok) {
-        console.error("Interaction Viewer - Failed to fetch transcript data, status:", response.status);
-        throw new Error('Failed to fetch transcript data');
+    console.log(`Interaction Viewer - Fetching transcript data from URL via /api/downloadTranscript`);
+    try {
+        const response = await fetch(`/api/downloadTranscript?uri=${encodeURIComponent(transcriptUrl.url)}`, {
+            headers: {
+                'Authorization': `Bearer ${platformClient.ApiClient.instance.authData.accessToken}` // Pass the auth token
+            }
+        });
+        if (!response.ok) {
+            console.error("Interaction Viewer - Failed to fetch transcript data, status:", response.status);
+            throw new Error(`Failed to fetch transcript data: ${response.status} ${response.statusText}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("Interaction Viewer - Error fetching transcript data:", error);
+        throw new Error('Error fetching transcript data: ' + error.message);
     }
-    return response.json();
 }
+
 
 async function fetchConversationSummary(conversationId) {
     console.log(`Interaction Viewer - Fetching conversation summary for ${conversationId}`);
-    const response = await fetch(`/api/getConversationSummary?conversationId=${conversationId}`);
-    if (!response.ok) {
-        console.error("Interaction Viewer - Failed to fetch conversation summary, status:", response.status);
-        throw new Error('Failed to fetch conversation summary');
+    try {
+        const summaryData = await conversationsApi.getConversationSummaries(conversationId);
+        return summaryData;
+    } catch (error) {
+        console.error("Interaction Viewer - Failed to fetch conversation summary:", error);
+        throw new Error('Failed to fetch conversation summary: ' + error.message);
     }
-    return response.json();
 }
 
 
@@ -222,6 +242,11 @@ async function initialize() {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
 
+        conversationsApi = new window.GenesysCloudSDK.ConversationsApi(); // Initialize APIs here
+        journeyApi = new window.GenesysCloudSDK.JourneyApi();
+        speechTextAnalyticsApi = new window.GenesysCloudSDK.SpeechTextAnalyticsApi();
+
+
         const conversationId = getConversationId();
         if (!conversationId) {
             throw new Error('No conversation ID provided in URL parameters.');
@@ -266,7 +291,7 @@ async function initialize() {
                 originatingDirection: session.originatingDirection,
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
-                agentSession: agentSessionInfo,
+                agentSession: agentSessionInfo, // Storing agent session info for transcript retrieval
                 mediaType: mediaType
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
