@@ -121,6 +121,10 @@ body {
     box-shadow: 2px 2px 7px var(--box-shadow-color);
 }
 
+.media-type-section.collapsed > *:not(.media-type-header-container) {
+    display: none;
+}
+
 .media-type-header-container {
     background-color: #f0f2f5;
     padding: 15px 20px;
@@ -213,6 +217,10 @@ body {
     background-color: var(--background-color);
 }
 
+.detail-section.collapsed .section-content {
+    display: none;
+}
+
 .section-header {
     background-color: #ffffff;
     padding: 15px 20px;
@@ -276,9 +284,6 @@ body {
     margin-bottom: 0;
 }
 
-.detail-section.collapsed .section-content {
-    display: none;
-}
 
 .detail-section.collapsed .section-header {
     border-bottom: none; /* Removed border-bottom when collapsed */
