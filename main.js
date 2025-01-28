@@ -179,23 +179,23 @@ async function displayConversationHistory(sessionsByType) {
 
                         try {
                             const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
-                            let agentCommunicationIdForTranscript = null;
-                            const agentParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'agent' || p.purpose === 'internal');
-                            if (agentParticipantForTranscript && agentParticipantForTranscript.sessions && agentParticipantForTranscript.sessions.length > 0) {
-                                agentCommunicationIdForTranscript = agentParticipantForTranscript.sessions[0].sessionId;
+                            let customerCommunicationIdForTranscript = null;
+                            const customerParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'customer' || p.purpose === 'external');
+                            if (customerParticipantForTranscript && customerParticipantForTranscript.sessions && customerParticipantForTranscript.sessions.length > 0) {
+                                customerCommunicationIdForTranscript = customerParticipantForTranscript.sessions[0].sessionId;
                             }
 
-                            if (agentCommunicationIdForTranscript) {
-                                const transcriptUrlData = await fetchTranscriptUrl(session.id, agentCommunicationIdForTranscript);
+                            if (customerCommunicationIdForTranscript) {
+                                const transcriptUrlData = await fetchTranscriptUrl(session.id, customerCommunicationIdForTranscript);
                                 if (transcriptUrlData) {
                                     const transcriptData = await fetchTranscriptData(transcriptUrlData);
                                     const transcriptHTML = processTranscript(transcriptData);
                                     transcriptContent.innerHTML = transcriptHTML;
                                 } else {
-                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>'; 
+                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>';
                                 }
                             } else {
-                                transcriptContent.innerHTML = '<p>Agent session ID not found, cannot load transcript.</p>';
+                                transcriptContent.innerHTML = '<p>Customer session ID not found, cannot load transcript.</p>';
                             }
 
                         } catch (error) {
@@ -221,7 +221,7 @@ async function displayConversationHistory(sessionsByType) {
                         const summaryContent = document.createElement('div');
                         summaryContent.classList.add('section-content');
                         summaryContent.innerHTML = '<p>Loading summary...</p>';
-                        summarySection.appendChild(summaryContent);
+                        summarySection.appendChild summaryContent;
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
