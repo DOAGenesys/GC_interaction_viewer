@@ -6,7 +6,7 @@ function startGCSDKs(clientId) {
         const qParamGcHostOrigin = 'gcHostOrigin';
         const qParamEnvironment = 'gcTargetEnv';
         let language = '';  
-        let redirectUri = 'https://gc-unattended-conversations.vercel.app';
+        let redirectUri = 'https://gc-interaction-viewer.vercel.app';
         let userDetails = null;
         let gcHostOrigin = '';
         assignConfiguration();
