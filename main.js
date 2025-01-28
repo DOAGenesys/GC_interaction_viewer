@@ -330,7 +330,7 @@ async function displayConversationHistory(sessionsByType) {
                     subjectOrType = `<span class="session-type">Type: ${session.messageType}</span>`;
                 }
                 const createdDate = new Date(session.createdDate);
-                const formattedCreatedDate = createdDate.toLocaleString();
+                const formattedCreatedDate = createdDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
                 sessionHeader.innerHTML = `
                     <a href="https://apps.${window.environment}/directory/#/analytics/interactions/${session.id}/admin" target="_blank" class="conversation-id-link">${session.id}</a>
