@@ -276,10 +276,12 @@ async function initialize() {
 
 
         const sessionsData = await fetchExternalContactSessions(externalContactId);
+        console.log('sessionsData after fetchExternalContactSessions:', sessionsData);
         const relevantSessions = sessionsData.entities.filter(session =>
             session.lastEvent?.eventName === "com.genesys.analytics.detailevents.FlowStartEvent" ||
             session.lastEvent?.eventName === "com.genesys.analytics.detailevents.AcdStartEvent"
         );
+        console.log('relevantSessions after filter:', relevantSessions);
 
         const sessionsByType = {};
         relevantSessions.forEach(session => {
