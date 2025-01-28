@@ -266,7 +266,7 @@ async function initialize() {
                 originatingDirection: session.originatingDirection,
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
-                agentSession: agentSessionInfo, // Storing agent session info for transcript retrieval
+                agentSession: agentSessionInfo,
                 mediaType: mediaType
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
