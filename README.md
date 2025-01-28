@@ -1,35 +1,52 @@
 # Genesys Cloud Interaction Viewer
 
-## Description
+## Overview
 
-The Genesys Cloud Interaction Viewer is a web application designed to display a historical view of customer interactions within Genesys Cloud. Starting with a specific conversation ID, the application retrieves and presents related interaction details, including:
+The Genesys Cloud Interaction Viewer is a web application designed to provide a comprehensive view of customer interactions within Genesys Cloud, designed to be deployed as an interaction widget within a Genesys Cloud organization. Starting with a specific Genesys Cloud conversation ID provided via interaction widget integration, the application retrieves and displays a historical timeline of related interactions for the associated customer. This tool is very valuable for agents to quickly grasp the context of a customer's journey and understand their engagement history.
 
-*   **Conversation History:** Lists recent conversations associated with the customer involved in the initial conversation.
-*   **Conversation Details:** For each conversation, it displays key information like ID, direction, subject (for emails), and creation date.
-*   **Transcription (On Demand):** Allows users to expand and view the transcript of a conversation.
-*   **Summary (On Demand):** Provides a summary, reason, follow-up, and resolution of the conversation.
-*   **Direct Link to Interaction:**  Conversation IDs are clickable links that open the interaction in the Genesys Cloud Admin UI in a new tab.
+## Key Features
 
-This tool helps agents and administrators quickly understand the context of a customer interaction by providing a consolidated view of their recent engagement history and conversation insights.
+*   **Conversation History Timeline:** Displays a chronologically ordered list of interactions related to the customer of the initial conversation, categorized by media type (Voice, Message, Email).
+*   **Interaction Filtering:** Allows filtering of conversation history by interaction status (Attended, Unattended, Other, All) to focus on specific types of engagements.
+*   **On-Demand Interaction Details:** Provides expandable sections for each interaction to view:
+    *   **Transcription:** Fetches and displays the transcript of voice and message interactions, including speaker identification and identified topics. For emails, it shows the subject and body.
+    *   **Summary:** Presents a summarized view of the conversation, including reason, follow-up actions, and resolution, when available.
+    *   **Analytics:** Displays key conversation analytics such as sentiment score, sentiment trend, and empathy scores to provide insights into the interaction's emotional tone and agent empathy.
+*   **Direct Genesys Cloud Interaction Link:** Each conversation ID is a direct, clickable link that opens the full interaction details in the Genesys Cloud Admin UI, enabling seamless transition to the Genesys Cloud environment for deeper investigation or action.
+*   **User-Friendly Interface:**  Features a clean, modern, and intuitive user interface for easy navigation and information consumption.
+*   **Status Filtering with Select2:** Implements a user-friendly, searchable, multi-select dropdown for filtering interactions by status using the Select2 library.
+*   **Loading and Error Handling:** Includes visual loading indicators and error messages to provide feedback during data retrieval processes, enhancing the user experience.
+*   **Responsive Design:**  Designed to be responsive and accessible across various screen sizes and devices.
 
-## Features
-
-*   **View Conversation History:** Retrieve and display a list of recent conversations for a customer, categorized by media type (e.g., Email, Voice).
-*   **Filter by Interaction Type:**  Focus on conversations initiated by flows or queues, filtering out other event types.
-*   **On-Demand Transcription:** Fetch and display conversation transcripts only when needed, improving initial load times.
-*   **Conversation Summary:** Access and display conversation summaries, including reason, follow-up, and resolution details, on demand.
-*   **Direct Interaction Link:**  Easily navigate to the full interaction details in Genesys Cloud for deeper analysis.
 
 ## Prerequisites
 
-1.  **Configure Environment Variables:**
+Before running the Genesys Cloud Interaction Viewer, ensure you have the following prerequisites in place:
 
-    *   `GC_OAUTH_CLIENT_ID`:  Your Genesys Cloud OAuth Client ID (Implicit Grant).
-  
+1.  **Genesys Cloud Interaction Widget Integration:** Deploy this as an interaction widget pointing to "https://<your_domain>/?langTag={{gcLangTag}}&gcTargetEnv={{gcTargetEnv}}&gcHostOrigin={{gcHostOrigin}}&conversationId={{gcConversationId}}"
+2.  **Genesys Cloud OAuth Client:**
+    *   You need to configure an OAuth Client in your Genesys Cloud organization with **Implicit Grant** type.
+    *   Note the **Client ID** of this OAuth client, as it will be needed to configure the application.
+    *   The OAuth Client should have the necessary permissions to access Genesys Cloud APIs, including:
+        *   `analytics:conversationdetails:view`
+        *   `journey:externalcontacts:view`
+        *   `speechandtextanalytics:conversation:view`
+        *   `speechandtextanalytics:conversationcommunication:view`
+        *   `conversations:transcription:view`
+        *   `conversations:summary:view`
+3.  **Environment Variable Configuration:**
+    *   Set the `GC_OAUTH_CLIENT_ID` environment variable to the Client ID of your Genesys Cloud OAuth client. This is necessary for the application to authenticate with Genesys Cloud.
+
 ## Running Instructions
 
-1.  **View Interaction Details:** The application will load, authenticate with Genesys Cloud, and display the conversation history and details for the provided conversation ID.
+1.  **Using the Interaction Viewer:**
+    *   **Conversation History Display:** Once authenticated and initialized, the application will display the conversation history related to the customer of the provided `conversationId`.
+    *   **Filtering Conversations:** Use the "Filter by Status" dropdown to filter the displayed conversations based on their status (All, Unattended, Attended, Other).
+    *   **Viewing Interaction Details:** Click on the headers ("Transcription", "Summary", "Analytics") of each session item to expand and view the respective details. The details are loaded on demand to improve initial loading performance.
+    *   **Navigating to Genesys Cloud:** Click on the conversation ID links to open the specific interaction in the Genesys Cloud Admin UI in a new tab for further actions or detailed analysis.
 
-    *   **Conversation List:**  Recent conversations will be grouped by media type.
-    *   **Expandable Sections:** Click on "Transcription" and "Summary" headers to expand and load these sections on demand.
-    *   **Conversation ID Links:** Click on the conversation IDs to open the interaction in Genesys Cloud Admin UI in a new tab.
+##  Important Notes
+
+*   **Error Handling:** The application includes error handling to gracefully manage API call failures and display informative error messages to the user. Check the browser's developer console for detailed error logs if issues arise.
+*   **Performance:**  Loading of transcriptions, summaries, and analytics is done on demand to ensure the initial page load is fast and efficient.
+*   **Security:**  The application uses the Implicit Grant OAuth flow, which is suitable for client-side applications. Ensure your OAuth Client is properly configured with the minimum required permissions.
