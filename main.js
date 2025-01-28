@@ -63,7 +63,6 @@ async function fetchExternalContactSessions(contactId) {
 }
 
 async function fetchTranscriptUrl(conversationId, communicationId) {
-    console.log(`GC interaction viewer - Fetching transcript URL for conversation ${conversationId}, communication ${communicationId}`);
     try {
         const transcriptUrlData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl(conversationId, communicationId);
         return transcriptUrlData;
@@ -73,13 +72,12 @@ async function fetchTranscriptUrl(conversationId, communicationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch transcript URL:", error);
-        displayErrorMessage('Failed to fetch transcript URL. Please check the console for details.');
-        throw new Error('Failed to fetch transcript URL: ' + error.message);
+        return null; // Return null instead of throwing error, handle null in fetchTranscriptData
     }
 }
 
-async function fetchTranscriptData(transcriptUrl) {
-    console.log(`GC interaction viewer - Fetching transcript data from URL via /api/downloadTranscript`);
+async function fetchTranscriptData(transcriptUrl, conversationId) {
+    if (!transcriptUrl) return null; // Handle null transcriptUrl gracefully
     try {
         const response = await fetch(`/api/downloadTranscript?uri=${encodeURIComponent(transcriptUrl.url)}`, {
             headers: {
@@ -87,20 +85,18 @@ async function fetchTranscriptData(transcriptUrl) {
             }
         });
         if (!response.ok) {
-            console.error("GC interaction viewer - Failed to fetch transcript data, status:", response.status);
-            throw new Error(`Failed to fetch transcript data: ${response.status} ${response.statusText}`);
+            console.error("GC interaction viewer - Failed to fetch transcript data, status:", response.status, response.statusText, "for conversationId:", conversationId);
+            return null; // Return null if fetch fails
         }
         return await response.json();
     } catch (error) {
-        console.error("GC interaction viewer - Error fetching transcript data:", error);
-        displayErrorMessage('Error fetching transcript data. Please check the console for details.');
-        throw new Error('Error fetching transcript data: ' + error.message);
+        console.error("GC interaction viewer - Error fetching transcript data:", error, "for conversationId:", conversationId);
+        return null; // Return null if json parsing or other error occurs
     }
 }
 
 
 async function fetchConversationSummary(conversationId) {
-    console.log(`GC interaction viewer - Fetching conversation summary for ${conversationId}`);
     try {
         const summaryData = await conversationsApi.getConversationSummaries(conversationId);
         return summaryData;
@@ -110,13 +106,11 @@ async function fetchConversationSummary(conversationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch conversation summary:", error);
-        displayErrorMessage('Failed to fetch conversation summary. Please check the console for details.');
-        throw new Error('Failed to fetch conversation summary: ' + error.message);
+        return null; // Return null instead of throwing error
     }
 }
 
 async function fetchConversationAnalytics(conversationId) {
-    console.log(`GC interaction viewer - Fetching conversation analytics for ${conversationId}`);
     try {
         const analyticsData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversation(conversationId);
         return analyticsData;
@@ -126,8 +120,7 @@ async function fetchConversationAnalytics(conversationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch conversation analytics:", error);
-        displayErrorMessage('Failed to fetch conversation analytics. Please check the console for details.');
-        throw new Error('Failed to fetch conversation analytics: ' + error.message);
+        return null; // Return null instead of throwing error
     }
 }
 
@@ -316,7 +309,7 @@ async function displayConversationHistory(sessionsByType) {
             mediaTypeSection.appendChild(noSessionsMessage);
         } else {
             const sessionsList = document.createElement('ul');
-            sessions.forEach(session => {
+            for (const session of sessions) { // Changed forEach to for...of to use async/await properly
                 console.log('Processing session:', session);
                 const sessionItem = document.createElement('li');
                 sessionItem.classList.add('session-item');
@@ -348,45 +341,9 @@ async function displayConversationHistory(sessionsByType) {
                 const transcriptionHeader = document.createElement('h5');
                 transcriptionHeader.innerHTML = '<i class="fas fa-file-alt section-detail-icon"></i> Transcription <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 transcriptionHeader.classList.add('section-header');
-                transcriptionHeader.addEventListener('click', async () => {
-                    transcriptionSection.classList.toggle('collapsed');
-                    const sectionContent = transcriptionSection.querySelector('.section-content');
-                    if (!transcriptionSection.dataset.transcriptLoaded) {
-                        console.log("Loading transcript for session:", session.id, transcriptionSection.dataset.transcriptLoaded);
-                        transcriptionSection.dataset.transcriptLoaded = 'true';
-                        displayLoading(sectionContent);
-
-                        try {
-                            const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
-                            let customerCommunicationIdForTranscript = null;
-                            const customerParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'customer' || p.purpose === 'external');
-                            if (customerParticipantForTranscript && customerParticipantForTranscript.sessions && customerParticipantForTranscript.sessions.length > 0) {
-                                customerCommunicationIdForTranscript = customerParticipantForTranscript.sessions[0].sessionId;
-                            }
-
-                            if (customerCommunicationIdForTranscript) {
-                                const transcriptUrlData = await fetchTranscriptUrl(session.id, customerCommunicationIdForTranscript);
-                                if (transcriptUrlData) {
-                                    const transcriptData = await fetchTranscriptData(transcriptUrlData);
-                                    const transcriptHTML = processTranscript(transcriptData, session.mediaType);
-                                    transcriptContent.innerHTML = transcriptHTML;
-                                    console.log("Transcript HTML content:", transcriptHTML);
-                                } else {
-                                    transcriptContent.innerHTML = '<p>No transcriptions available for this conversation.</p>';
-                                }
-                            } else {
-                                transcriptContent.innerHTML = '<p>Customer session ID not found, cannot load transcript.</p>';
-                            }
-
-                        } catch (error) {
-                            console.error("Error loading transcription:", error);
-                            transcriptContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading transcription: ${error.message}</div>`;
-                        }
-                    }
-                });
-                const transcriptionContent = document.createElement('div');
+                const transcriptionContent = document.createElement('div'); // Create content div here
                 transcriptionContent.classList.add('section-content');
-                transcriptionSection.appendChild(transcriptionContent);
+                transcriptionSection.appendChild(transcriptionContent); // Append it
                 detailsDiv.appendChild(transcriptionSection);
 
 
@@ -395,22 +352,76 @@ async function displayConversationHistory(sessionsByType) {
                 const summaryHeader = document.createElement('h5');
                 summaryHeader.innerHTML = '<i class="fas fa-clipboard-check section-detail-icon"></i> Summary <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 summaryHeader.classList.add('section-header');
+                const summaryContent = document.createElement('div'); // Create content div here
+                summaryContent.classList.add('section-content');
+                summarySection.appendChild(summaryContent); // Append it
+                detailsDiv.appendChild(summarySection);
 
-                summaryHeader.addEventListener('click', async () => {
+                const analyticsSection = document.createElement('div');
+                analyticsSection.classList.add('detail-section', 'collapsed');
+                const analyticsHeader = document.createElement('h5');
+                analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
+                analyticsHeader.classList.add('section-header');
+                const analyticsContent = document.createElement('div'); // Create content div here
+                analyticsContent.classList.add('section-content');
+                analyticsSection.appendChild(analyticsContent); // Append it
+                detailsDiv.appendChild(analyticsSection);
+
+
+                sessionItem.appendChild(detailsDiv);
+                sessionsList.appendChild(sessionItem);
+
+                // Pre-fetch data and store in sessionItem dataset
+                let customerCommunicationIdForTranscript = null;
+                try {
+                    const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
+                    const customerParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'customer' || p.purpose === 'external');
+                    if (customerParticipantForTranscript && customerParticipantForTranscript.sessions && customerParticipantForTranscript.sessions.length > 0) {
+                        customerCommunicationIdForTranscript = customerParticipantForTranscript.sessions[0].sessionId;
+                    }
+                } catch (error) {
+                    console.error("Error fetching conversation details for transcript pre-fetch:", error);
+                }
+
+
+                const transcriptUrlData = await fetchTranscriptUrl(session.id, customerCommunicationIdForTranscript);
+                const transcriptData = await fetchTranscriptData(transcriptUrlData, session.id);
+                sessionItem.dataset.transcriptData = JSON.stringify(transcriptData); // Store fetched transcript data
+
+                const summaryData = await fetchConversationSummary(session.id);
+                sessionItem.dataset.summaryData = JSON.stringify(summaryData); // Store fetched summary data
+
+                const analyticsData = await fetchConversationAnalytics(session.id);
+                sessionItem.dataset.analyticsData = JSON.stringify(analyticsData); // Store fetched analytics data
+
+
+                transcriptionHeader.addEventListener('click', () => {
+                    transcriptionSection.classList.toggle('collapsed');
+                    if (!transcriptionSection.dataset.contentLoaded) {
+                        transcriptionSection.dataset.contentLoaded = 'true';
+                        displayLoading(transcriptionContent);
+                        const storedTranscriptData = JSON.parse(sessionItem.dataset.transcriptData);
+                        if (storedTranscriptData) {
+                            const transcriptHTML = processTranscript(storedTranscriptData, session.mediaType);
+                            transcriptionContent.innerHTML = transcriptHTML;
+                        } else {
+                            transcriptionContent.innerHTML = '<p>No transcript data available.</p>';
+                        }
+                    }
+                });
+
+
+                summaryHeader.addEventListener('click', () => {
                     summarySection.classList.toggle('collapsed');
-                    const sectionContent = summarySection.querySelector('.section-content');
-                    if (!summarySection.dataset.summaryLoaded) {
-                        console.log("Loading summary for session:", session.id, summarySection.dataset.summaryLoaded);
-                        summarySection.dataset.summaryLoaded = 'true';
-                        displayLoading(sectionContent);
-
-                        try {
-                            const summaryData = await fetchConversationSummary(session.id);
-                            if (summaryData && summaryData.summary) {
-                                const summaryText = summaryData.summary.text ? `<p><strong>Summary:</strong> ${summaryData.summary.text}</p>` : '';
-                                const reasonText = summaryData.summary.reason && summaryData.summary.reason.text ? `<p><strong>Reason:</strong> ${summaryData.summary.reason.text}</p>` : '';
-                                const followupText = summaryData.summary.followup && summaryData.summary.followup.text ? `<p><strong>Follow up:</strong> ${summaryData.summary.followup.text}</p>` : '';
-                                const resolutionText = summaryData.summary.resolution && summaryData.summary.resolution.text ? `<p><strong>Resolution:</strong> ${summaryData.summary.resolution.text}</p>` : '';
+                    if (!summarySection.dataset.contentLoaded) {
+                        summarySection.dataset.contentLoaded = 'true';
+                        displayLoading(summaryContent);
+                        const storedSummaryData = JSON.parse(sessionItem.dataset.summaryData);
+                        if (storedSummaryData && storedSummaryData.summary) {
+                             const summaryText = storedSummaryData.summary.text ? `<p><strong>Summary:</strong> ${storedSummaryData.summary.text}</p>` : '';
+                                const reasonText = storedSummaryData.summary.reason && storedSummaryData.summary.reason.text ? `<p><strong>Reason:</strong> ${storedSummaryData.summary.reason.text}</p>` : '';
+                                const followupText = storedSummaryData.summary.followup && storedSummaryData.summary.followup.text ? `<p><strong>Follow up:</strong> ${storedSummaryData.summary.followup.text}</p>` : '';
+                                const resolutionText = storedSummaryData.summary.resolution && storedSummaryData.summary.resolution.text ? `<p><strong>Resolution:</strong> ${storedSummaryData.summary.resolution.text}</p>` : '';
 
                                 summaryContent.innerHTML = `
                                     ${summaryText}
@@ -418,59 +429,27 @@ async function displayConversationHistory(sessionsByType) {
                                     ${followupText}
                                     ${resolutionText}
                                 `;
-                                console.log("Summary HTML content:", summaryContent.innerHTML);
-                            } else {
-                                summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
-                            }
-                        } catch (error) {
-                            console.error("Error loading summary:", error);
-                            summaryContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading summary: ${error.message}</div>`;
+                        } else {
+                            summaryContent.innerHTML = '<p>No summary data available.</p>';
                         }
                     }
                 });
-                const summaryContent = document.createElement('div');
-                summaryContent.classList.add('section-content');
-                summarySection.appendChild(summaryContent);
-                detailsDiv.appendChild(summarySection);
 
-
-                const analyticsSection = document.createElement('div');
-                analyticsSection.classList.add('detail-section', 'collapsed');
-                const analyticsHeader = document.createElement('h5');
-                analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
-                analyticsHeader.classList.add('section-header');
-
-                analyticsHeader.addEventListener('click', async () => {
+                analyticsHeader.addEventListener('click', () => {
                     analyticsSection.classList.toggle('collapsed');
-                    const sectionContent = analyticsSection.querySelector('.section-content');
-                    if (!analyticsSection.dataset.analyticsLoaded) {
-                        console.log("Loading analytics for session:", session.id, analyticsSection.dataset.analyticsLoaded);
-                        analyticsSection.dataset.analyticsLoaded = 'true';
-                        displayLoading(sectionContent);
-                        try {
-                            const analyticsData = await fetchConversationAnalytics(session.id);
-                            if (analyticsData) {
-                                const analyticsDisplayHTML = displayConversationAnalytics(analyticsData);
-                                analyticsContent.innerHTML = `<div class="analytics-grid">${analyticsDisplayHTML}</div>`;
-                                console.log("Analytics HTML content:", analyticsDisplayHTML);
-                            } else {
-                                analyticsContent.innerHTML = '<p>No analytics data available for this conversation.</p>';
-                            }
-                        } catch (error) {
-                            console.error("Error loading analytics:", error);
-                            analyticsContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading analytics: ${error.message}</div>`;
+                    if (!analyticsSection.dataset.contentLoaded) {
+                        analyticsSection.dataset.contentLoaded = 'true';
+                        displayLoading(analyticsContent);
+                        const storedAnalyticsData = JSON.parse(sessionItem.dataset.analyticsData);
+                        if (storedAnalyticsData) {
+                            const analyticsDisplayHTML = displayConversationAnalytics(storedAnalyticsData);
+                            analyticsContent.innerHTML = `<div class="analytics-grid">${analyticsDisplayHTML}</div>`;
+                        } else {
+                            analyticsContent.innerHTML = '<p>No analytics data available.</p>';
                         }
                     }
                 });
-                const analyticsContent = document.createElement('div');
-                analyticsContent.classList.add('section-content');
-                analyticsSection.appendChild(analyticsContent);
-                detailsDiv.appendChild(analyticsSection);
-
-
-                sessionItem.appendChild(detailsDiv);
-                sessionsList.appendChild(sessionItem);
-            });
+            }
             mediaTypeSection.appendChild(sessionsList);
         }
         historyByTypeDiv.appendChild(mediaTypeSection);
