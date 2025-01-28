@@ -1,32 +1,50 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Interaction Viewer</title>
-    <script src="https://sdk-cdn.mypurecloud.com/javascript/213.1.0/purecloud-platform-client-v2.min.js"></script>
-    <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesys Cloud Interaction Viewer</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://sdk-cdn.mypurecloud.com/javascript/213.1.0/purecloud-platform-client-v2.min.js"></script>
+    <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <div class="container">
-        <div id="conversationHistory">
-            <h3>Conversation History</h3>
-            <div id="filter-container">
-                <label for="status-filter">Filter by Status:</label>
-                <select id="status-filter" multiple="multiple" style="width: 100%;">
-                    <option value="all">All</option>
-                    <option value="unattended">Unattended</option>
-                    <option value="attended">Attended</option>
-                    <option value="other">Other</option>
-                </select>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <img src="genesys-logo.svg" alt="Genesys Logo" class="genesys-logo">
+                <h1>Interaction Viewer</h1>
             </div>
-            <div id="historyByType" style="display: none;"></div>
-        </div>
+        </header>
+        <main class="app-main">
+            <section id="conversationHistory" class="conversation-history-section">
+                <div class="section-header">
+                    <i class="fas fa-history section-icon"></i>
+                    <h3>Conversation History</h3>
+                </div>
+                <div id="filter-container" class="filter-container">
+                    <label for="status-filter"><i class="fas fa-filter"></i> Filter by Status:</label>
+                    <select id="status-filter" multiple="multiple" style="width: 100%;">
+                        <option value="all">All</option>
+                        <option value="unattended">Unattended</option>
+                        <option value="attended">Attended</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div id="historyByType" class="history-by-type" style="display: none;"></div>
+            </section>
+        </main>
+        <footer class="app-footer">
+            <p>© 2024 Genesys Cloud Interaction Viewer. All rights reserved.</p>
+        </footer>
     </div>
-
     <script src="startGCSDKs.js"></script>
     <script src="main.js"></script>
+    <script src="https://kit.fontawesome.com/a78374c904.js" crossorigin="anonymous"></script>
 </body>
 </html>
