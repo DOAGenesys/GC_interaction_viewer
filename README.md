@@ -1,3 +1,5 @@
+the readme.md file:
+
 # Genesys Cloud Unattended Interaction Viewer
 
 ## Description
@@ -24,17 +26,9 @@ This tool helps agents and administrators quickly understand the context of a cu
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
-
-*   **Node.js and npm:**  Node.js is required to run the development server and manage project dependencies. npm (Node Package Manager) comes bundled with Node.js. You can download them from [https://nodejs.org/](https://nodejs.org/).
-*   **Genesys Cloud Account:** You need access to a Genesys Cloud organization to use this application.
-*   **Genesys Cloud OAuth Client:** You will need to create an OAuth Client in your Genesys Cloud organization with **Implicit Grant** type.  Make sure to configure the **Redirect URI** for your application (e.g., `http://localhost:8080` if running locally). You will need the **Client ID** from this OAuth client.
-
-2.  **Configure Environment Variables:**
-    You need to set the following environment variables.  For local development, you can either set them directly in your terminal session or use a `.env` file in the project root (you will need to install `dotenv` if you choose to use a `.env` file and load it in your server-side code, though this example is client-side only, so adjust accordingly based on your serving method).
+1.  **Configure Environment Variables:**
 
     *   `GC_OAUTH_CLIENT_ID`:  Your Genesys Cloud OAuth Client ID (Implicit Grant).
-    *   `REDIRECT_URI`: The Redirect URI you configured in your Genesys Cloud OAuth Client to allow this app.
   
 ## Running Instructions
 
@@ -43,13 +37,3 @@ Before you begin, ensure you have the following installed:
     *   **Conversation List:**  Recent conversations will be grouped by media type.
     *   **Expandable Sections:** Click on "Transcription" and "Summary" headers to expand and load these sections on demand.
     *   **Conversation ID Links:** Click on the conversation IDs to open the interaction in Genesys Cloud Admin UI in a new tab.
-
-## API Endpoints
-
-The application utilizes the following backend API endpoints (implemented as serverless functions or similar in a real-world deployment) to interact with Genesys Cloud APIs:
-
-*   `/api/getConfig.js`: Returns configuration parameters like `clientId` and `redirectUri` from environment variables.
-*   `/api/getConversationDetails.js`: Fetches detailed information about a specific conversation using the Genesys Cloud Conversations API (`getAnalyticsConversationDetails`).
-*   `/api/getExternalContactSessions.js`: Retrieves recent sessions for a given external contact using the Genesys Cloud Journey API (`getExternalcontactsContactJourneySessions`).
-*   `/api/getTranscriptUrl.js`:  Gets a pre-signed S3 URL for the transcript of a specific communication within a conversation using the Genesys Cloud Speech and Text Analytics API (`getSpeechandtextanalyticsConversationCommunicationTranscripturl`).
-*   `/api/getConversationSummary.js`: Retrieves the summary of a conversation using the Genesys Cloud Conversations API (`getConversationSummaries`).
