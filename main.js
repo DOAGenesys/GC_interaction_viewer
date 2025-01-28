@@ -5,21 +5,21 @@ let journeyApi = null;
 let speechTextAnalyticsApi = null;
 
 async function getConfig() {
-    console.log("GC unattended viewer - Interaction Viewer - Fetching configuration from /api/getConfig");
+    console.log("GC unattended viewer - Fetching configuration from /api/getConfig");
     const response = await fetch('/api/getConfig');
     if (!response.ok) {
         console.error("Interaction Viewer - Failed to fetch config, status:", response.status);
         throw new Error('Failed to get config');
     }
-    console.log("GC unattended viewer - Interaction Viewer - Successfully retrieved configuration");
+    console.log("GC unattended viewer - Successfully retrieved configuration");
     return response.json();
 }
 
 function getConversationId() {
-    console.log("GC unattended viewer - Interaction Viewer - Extracting conversation ID from URL parameters");
+    console.log("GC unattended viewer - Extracting conversation ID from URL parameters");
     const urlParams = new URLSearchParams(window.location.search);
     const conversationId = urlParams.get('conversationId');
-    console.log("GC unattended viewer - Interaction Viewer - Conversation ID found:", conversationId || 'none');
+    console.log("GC unattended viewer - Conversation ID found:", conversationId || 'none');
     return conversationId;
 }
 
@@ -239,7 +239,7 @@ function displayConversationHistory(sessionsByType) {
 
 
 async function initialize() {
-    console.log("GC unattended viewer - Interaction Viewer - Starting application initialization");
+    console.log("GC unattended viewer - Starting application initialization");
     try {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
