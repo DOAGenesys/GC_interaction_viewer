@@ -39,31 +39,6 @@ body {
     min-height: 100vh;
 }
 
-.app-header {
-    background-color: var(--header-background);
-    color: var(--header-text-color);
-    padding: 20px 30px;
-    box-shadow: 0 2px 5px var(--box-shadow-color);
-    margin-bottom: 20px;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.genesys-logo {
-    height: 40px;
-    margin-right: 20px;
-}
-
-.app-header h1 {
-    margin: 0;
-    font-size: 2em;
-    font-weight: 700;
-}
 
 .app-main {
     flex: 1;
@@ -246,7 +221,7 @@ body {
     justify-content: space-between;
     align-items: center;
     transition: background-color 0.3s ease;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color); /* Added border-bottom */
     font-weight: 500;
     color: var(--text-color-dark);
 }
@@ -306,7 +281,7 @@ body {
 }
 
 .detail-section.collapsed .section-header {
-    border-bottom: none;
+    border-bottom: none; /* Removed border-bottom when collapsed */
     border-radius: 5px;
 }
 
@@ -426,5 +401,5 @@ body {
 }
 
 .history-by-type {
-    display: none;
+    display: none; /* Hidden by default, shown by JS */
 }
