@@ -122,7 +122,7 @@ body {
 }
 
 .media-type-section.collapsed > *:not(.media-type-header-container) {
-    display: none;
+    display: none !important;
 }
 
 .media-type-header-container {
