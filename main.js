@@ -54,6 +54,10 @@ async function fetchTranscriptUrl(conversationId, communicationId) {
         const transcriptUrlData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl(conversationId, communicationId);
         return transcriptUrlData;
     } catch (error) {
+        if (error.status === 404) {
+            console.warn("Transcript URL not found (404) for conversation:", conversationId, "communication:", communicationId);
+            return null; // Return null to indicate no transcript URL found
+        }
         console.error("GC unattended viewer - Failed to fetch transcript URL:", error);
         throw new Error('Failed to fetch transcript URL: ' + error.message);
     }
@@ -82,15 +86,13 @@ async function fetchTranscriptData(transcriptUrl) {
 async function fetchConversationSummary(conversationId) {
     console.log(`GC unattended viewer - Fetching conversation summary for ${conversationId}`);
     try {
-        // Debugging logs to inspect conversationsApi
-        console.log('typeof conversationsApi:', typeof conversationsApi);
-        console.log('conversationsApi:', conversationsApi);
-        console.log('ConversationsApi constructor:', platformClient.ConversationsApi);
-
-
         const summaryData = await conversationsApi.getConversationSummaries(conversationId);
         return summaryData;
     } catch (error) {
+        if (error.status === 404) {
+            console.warn("Conversation summary not found (404) for conversation:", conversationId);
+            return null; // Return null to indicate no summary found
+        }
         console.error("GC unattended viewer - Failed to fetch conversation summary:", error);
         throw new Error('Failed to fetch conversation summary: ' + error.message);
     }
@@ -179,9 +181,13 @@ function displayConversationHistory(sessionsByType) {
                             const agentSession = session.agentSession;
                             if (agentSession && agentSession.sessionId) {
                                 const transcriptUrlData = await fetchTranscriptUrl(session.id, agentSession.sessionId);
-                                const transcriptData = await fetchTranscriptData(transcriptUrlData);
-                                const transcriptHTML = processTranscript(transcriptData);
-                                transcriptContent.innerHTML = transcriptHTML;
+                                if (transcriptUrlData) { // Check if transcriptUrlData is not null (404 handled)
+                                    const transcriptData = await fetchTranscriptData(transcriptUrlData);
+                                    const transcriptHTML = processTranscript(transcriptData);
+                                    transcriptContent.innerHTML = transcriptHTML;
+                                } else {
+                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>'; // Display "No transcriptions available" for 404
+                                }
                             } else {
                                 transcriptContent.innerHTML = '<p>Agent session ID not found, cannot load transcript.</p>';
                             }
@@ -213,17 +219,21 @@ function displayConversationHistory(sessionsByType) {
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
-                            const summaryText = summaryData.summary?.text || 'N/A';
-                            const reasonText = summaryData.summary?.reason?.text || 'N/A';
-                            const followupText = summaryData.summary?.followup?.text || 'N/A';
-                            const resolutionText = summaryData.summary?.resolution?.text || 'N/A';
+                            if (summaryData) { // Check if summaryData is not null (404 handled)
+                                const summaryText = summaryData.summary?.text || 'N/A';
+                                const reasonText = summaryData.summary?.reason?.text || 'N/A';
+                                const followupText = summaryData.summary?.followup?.text || 'N/A';
+                                const resolutionText = summaryData.summary?.resolution?.text || 'N/A';
 
-                            summaryContent.innerHTML = `
-                                <p><strong>Summary:</strong> ${summaryText}</p>
-                                <p><strong>Reason:</strong> ${reasonText}</p>
-                                <p><strong>Follow up:</strong> ${followupText}</p>
-                                <p><strong>Resolution:</strong> ${resolutionText}</p>
-                            `;
+                                summaryContent.innerHTML = `
+                                    <p><strong>Summary:</strong> ${summaryText}</p>
+                                    <p><strong>Reason:</strong> ${reasonText}</p>
+                                    <p><strong>Follow up:</strong> ${followupText}</p>
+                                    <p><strong>Resolution:</strong> ${resolutionText}</p>
+                                `;
+                            } else {
+                                summaryContent.innerHTML = '<p>No summaries available.</p>'; // Display "No summaries available" for 404
+                            }
                         } catch (error) {
                             console.error("Error loading summary:", error);
                             summaryContent.innerHTML = `<p>Error loading summary: ${error.message}</p>`;
@@ -250,16 +260,9 @@ async function initialize() {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
 
-        console.log('typeof platformClient after startGCSDKs:', typeof platformClient);
-        console.log('platformClient after startGCSDKs:', platformClient);
-
-
         conversationsApi = new platformClient.ConversationsApi();
         journeyApi = new platformClient.JourneyApi();
         speechTextAnalyticsApi = new platformClient.SpeechTextAnalyticsApi();
-
-        // Debug log to inspect ConversationsApi constructor
-        console.log('platformClient.ConversationsApi constructor:', platformClient.ConversationsApi);
 
 
         const conversationId = getConversationId();
