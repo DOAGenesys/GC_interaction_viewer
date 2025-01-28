@@ -37,7 +37,6 @@ async function fetchConversationDetails(conversationId) {
 async function fetchExternalContactSessions(contactId) {
     console.log(`GC interaction viewer - Fetching external contact sessions for ${contactId}`);
     let opts = { 
-      "pageSize": "200",
       "includeMerged": true
     };
     try {
