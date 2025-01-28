@@ -135,7 +135,7 @@ function processTranscript(transcriptJson, mediaType) {
                     transcriptHTML += `<p><strong>Subject:</strong> ${text}</p>`;
                 } else if (mediaType === 'Email' && phrase.type === 'body') {
                     transcriptHTML += `<p>${text}</p>`;
-                } else if (mediaType !== 'Email') {
+                } else if (mediaType !== 'Email') { // For Voice and Message
                     if (participantPurpose !== currentParticipant) {
                         transcriptHTML += `<p><strong>${participantPurpose.toUpperCase()}:</strong> ${text}</p>`;
                         currentParticipant = participantPurpose;
@@ -199,18 +199,16 @@ function applyStatusFilter(sessions, selectedStatuses) {
     }
 
     return sessions.filter(session => {
-        let sessionStatus = 'other';
+        let sessionStatus = 'other'; // Default status
 
         if (session.lastEvent && session.lastEvent.eventName) {
             const eventName = session.lastEvent.eventName;
-             if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent") {
-                 sessionStatus = 'onFlow';
-             } else if (eventName === "com.genesys.analytics.detailevents.AcdStartEvent") {
-                 sessionStatus = 'onQueue';
+             if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent" || eventName === "com.genesys.analytics.detailevents.AcdStartEvent") {
+                 sessionStatus = 'unattended';
              } else if (eventName === "com.genesys.analytics.detailevents.AcdEndEvent" || eventName === "com.genesys.analytics.detailevents.AfterCallWorkEvent") {
                  sessionStatus = 'attended';
              }
-             
+
         }
 
         return selectedStatuses.includes(sessionStatus);
@@ -490,7 +488,7 @@ async function initialize() {
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
                 mediaType: mediaType,
-                messageType: session.conversationChannels[0].messageType,
+                messageType: session.conversationChannels[0].messageType, // Add messageType
                 lastEvent: session.lastEvent
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
@@ -506,9 +504,12 @@ async function initialize() {
          });
 
         $('#status-filter').on('change', function () {
-           
+
+             const selectedStatuses = $(this).val();
+             const filteredSessions = applyStatusFilter(allSessions, selectedStatuses);
+
              const sessionsByType = {};
-            relevantSessions.forEach(session => {
+             filteredSessions.forEach(session => {
                 const mediaType = session.conversationChannels[0].type;
                 if (!sessionsByType[mediaType]) {
                     sessionsByType[mediaType] = [];
@@ -519,7 +520,7 @@ async function initialize() {
                     conversationSubject: session.conversationSubject,
                     createdDate: session.createdDate,
                     mediaType: mediaType,
-                    messageType: session.conversationChannels[0].messageType,
+                    messageType: session.conversationChannels[0].messageType, // Add messageType
                     lastEvent: session.lastEvent
                 };
                 sessionsByType[mediaType].push(sessionDisplayInfo);
