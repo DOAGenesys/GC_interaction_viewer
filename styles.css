@@ -178,3 +178,48 @@ h6 {
     border-radius: 20px;
     font-size: 0.85em;
 }
+
+
+.media-type-section.collapsed > *:not(.media-type-header-container) {
+  display: none;
+}
+
+.media-type-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.expand-collapse-button {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #555;
+    margin-left: 10px;
+}
+
+.expand-collapse-button:hover {
+    background-color: #d0d0d0;
+}
+
+#filter-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+#filter-container label {
+    margin-right: 10px;
+    font-weight: 500;
+    color: #3f51b5;
+}
+
+#filter-container select {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #cfd8dc;
+    border-radius: 4px;
+}
