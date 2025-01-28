@@ -197,14 +197,20 @@ function displayConversationAnalytics(analyticsData) {
 function getSessionStatus(session) {
     if (session.lastEvent && session.lastEvent.eventName) {
         const eventName = session.lastEvent.eventName;
-        if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent" || eventName === "com.genesys.analytics.detailevents.AcdStartEvent") {
+        console.log(`Session ID: ${session.id}, Event Name: ${eventName}`);
+
+        if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent" || eventName === "com.genesys.analytics.detailevents.AcdStartEvent" || eventName === "com.genesys.analytics.detailevents.FlowEndEvent") { // Modified logic to include FlowEndEvent
+            console.log(`Session ${session.id} categorized as: Unattended`);
             return 'unattended';
         } else if (eventName === "com.genesys.analytics.detailevents.AcdEndEvent" || eventName === "com.genesys.analytics.detailevents.AfterCallWorkEvent") {
+            console.log(`Session ${session.id} categorized as: Attended`);
             return 'attended';
         } else {
+            console.log(`Session ${session.id} categorized as: Other`);
             return 'other';
         }
     }
+    console.log(`Session ${session.id} categorized as: Other (No lastEvent or eventName)`);
     return 'other';
 }
 
