@@ -1,6 +1,4 @@
-the readme.md file:
-
-# Genesys Cloud Unattended Interaction Viewer
+# Genesys Cloud Interaction Viewer
 
 ## Description
 
@@ -20,9 +18,7 @@ This tool helps agents and administrators quickly understand the context of a cu
 *   **Filter by Interaction Type:**  Focus on conversations initiated by flows or queues, filtering out other event types.
 *   **On-Demand Transcription:** Fetch and display conversation transcripts only when needed, improving initial load times.
 *   **Conversation Summary:** Access and display conversation summaries, including reason, follow-up, and resolution details, on demand.
-*   **Genesys Cloud UI Aligned Styling:**  The application's styling is designed to be visually consistent with the Genesys Cloud user interface for a seamless user experience.
 *   **Direct Interaction Link:**  Easily navigate to the full interaction details in Genesys Cloud for deeper analysis.
-*   **Modular Codebase:**  Well-structured code with separate files for API calls and UI logic for maintainability and scalability.
 
 ## Prerequisites
 
