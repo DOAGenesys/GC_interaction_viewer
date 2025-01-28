@@ -64,7 +64,7 @@ async function fetchTranscriptData(transcriptUrl) {
     try {
         const response = await fetch(`/api/downloadTranscript?uri=${encodeURIComponent(transcriptUrl.url)}`, {
             headers: {
-                'Authorization': `Bearer ${platformClient.ApiClient.instance.authData.accessToken}` // Pass the auth token
+                'Authorization': `Bearer ${platformClient.ApiClient.instance.authData.accessToken}`
             }
         });
         if (!response.ok) {
@@ -242,9 +242,9 @@ async function initialize() {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
 
-        conversationsApi = new window.GenesysCloudSDK.ConversationsApi(); // Initialize APIs here
-        journeyApi = new window.GenesysCloudSDK.JourneyApi();
-        speechTextAnalyticsApi = new window.GenesysCloudSDK.SpeechTextAnalyticsApi();
+        conversationsApi = new platformClient.ConversationsApi();
+        journeyApi = new platformClient.JourneyApi();
+        speechTextAnalyticsApi = new platformClient.SpeechTextAnalyticsApi();
 
 
         const conversationId = getConversationId();
@@ -269,7 +269,7 @@ async function initialize() {
         const agentParticipant = conversationDetails.participants.find(p => p.purpose === 'agent' || p.purpose === 'internal');
         let agentSessionInfo = null;
         if (agentParticipant && agentParticipant.sessions && agentParticipant.sessions.length > 0) {
-            agentSessionInfo = agentParticipant.sessions[0]; // Assuming first session is relevant communication
+            agentSessionInfo = agentParticipant.sessions[0];
             agentCommunicationId = agentSessionInfo.sessionId;
         }
 
@@ -291,7 +291,7 @@ async function initialize() {
                 originatingDirection: session.originatingDirection,
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
-                agentSession: agentSessionInfo, // Storing agent session info for transcript retrieval
+                agentSession: agentSessionInfo,
                 mediaType: mediaType
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
