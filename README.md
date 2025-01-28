@@ -36,7 +36,9 @@ Before running the Genesys Cloud Interaction Viewer, ensure you have the followi
         *   `conversations:summary:view`
 3.  **Environment Variable Configuration:**
     *   Set the `GC_OAUTH_CLIENT_ID` environment variable to the Client ID of your Genesys Cloud OAuth client. This is necessary for the application to authenticate with Genesys Cloud.
-
+4.  **Domain setup:**
+    *   Set the `redirectUri` constant in startGCSDKs.js as per your domain.
+	
 ## Running Instructions
 
 1.  **Using the Interaction Viewer:**
