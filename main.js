@@ -105,15 +105,24 @@ function processTranscript(transcriptJson, mediaType) {
     }
 
     let transcriptHTML = '';
+    let sentimentScore = 0;
+    let sentimentCount = 0;
+    let empathyScore = 0;
+    let empathyCount = 0;
+    let topics = new Set();
 
-    if (mediaType === 'Voice' || mediaType === 'Message') {
-        for (const transcript of transcriptJson.transcripts) {
-            if (transcript.phrases && transcript.phrases.length > 0) {
-                let currentParticipant = null;
-                for (const phrase of transcript.phrases) {
-                    const participantPurpose = phrase.participantPurpose || 'unknown';
-                    const text = phrase.text;
+    transcriptJson.transcripts.forEach(transcript => {
+        if (transcript.phrases) {
+            let currentParticipant = null;
+            transcript.phrases.forEach(phrase => {
+                const participantPurpose = phrase.participantPurpose || 'unknown';
+                const text = phrase.text;
 
+                if (mediaType === 'Email' && phrase.type === 'subject') {
+                    transcriptHTML += `<p><strong>Subject:</strong> ${text}</p>`;
+                } else if (mediaType === 'Email' && phrase.type === 'body') {
+                    transcriptHTML += `<p>${text}</p>`;
+                } else if (mediaType !== 'Email') { // For Voice and Message
                     if (participantPurpose !== currentParticipant) {
                         transcriptHTML += `<p><strong>${participantPurpose.toUpperCase()}:</strong> ${text}</p>`;
                         currentParticipant = participantPurpose;
@@ -121,26 +130,53 @@ function processTranscript(transcriptJson, mediaType) {
                         transcriptHTML += `<p>${text}</p>`;
                     }
                 }
+            });
+        }
+
+        if (transcript.analytics) {
+            if (transcript.analytics.sentiment) {
+                transcript.analytics.sentiment.forEach(s => {
+                    sentimentScore += s.sentiment;
+                    sentimentCount++;
+                });
+            }
+            if (transcript.analytics.empathy) {
+                transcript.analytics.empathy.forEach(e => {
+                    empathyScore += e.empathy;
+                    empathyCount++;
+                });
+            }
+            if (transcript.analytics.topics) {
+                transcript.analytics.topics.forEach(topic => {
+                    topics.add(topic.topicName);
+                });
             }
         }
-    } else if (mediaType === 'Email') {
-        const transcript = transcriptJson.transcripts[0]; // Assuming only one transcript for email
-        if (transcript.phrases && transcript.phrases.length > 0) {
-            for (const phrase of transcript.phrases) {
-                const type = phrase.type || 'unknown';
-                const text = phrase.text;
-                transcriptHTML += `<p><strong>${type.toUpperCase()}:</strong> ${text}</p>`;
-            }
-        }
-    } else {
-        return "<p>Unsupported media type for transcription.</p>";
+    });
+
+    let analyticsHTML = '';
+    if (sentimentCount > 0) {
+        const avgSentiment = ((sentimentScore / sentimentCount) * 100).toFixed(2);
+        analyticsHTML += `<p><strong>Average Sentiment:</strong> ${avgSentiment}%</p>`;
+    }
+    if (empathyCount > 0) {
+        const avgEmpathy = ((empathyScore / empathyCount) * 100).toFixed(2);
+        analyticsHTML += `<p><strong>Average Empathy:</strong> ${avgEmpathy}%</p>`;
     }
 
-    if (!transcriptHTML) {
-        return "<p>No transcript available for this media type.</p>";
+    if (topics.size > 0) {
+        const topicsArray = Array.from(topics);
+        const topicsTags = topicsArray.map(topic => `<span class="topic-tag">${topic}</span>`).join('');
+        analyticsHTML += `
+            <div class="topics-section">
+                <h6 class="topics-header">Topics:</h6>
+                <div class="topic-tags-container">${topicsTags}</div>
+            </div>
+        `;
     }
 
-    return transcriptHTML;
+
+    return transcriptHTML + analyticsHTML;
 }
 
 
