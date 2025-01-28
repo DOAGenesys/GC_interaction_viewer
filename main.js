@@ -5,37 +5,37 @@ let journeyApi = null;
 let speechTextAnalyticsApi = null;
 
 async function getConfig() {
-    console.log("GC unattended viewer - Fetching configuration from /api/getConfig");
+    console.log("GC interaction viewer - Fetching configuration from /api/getConfig");
     const response = await fetch('/api/getConfig');
     if (!response.ok) {
-        console.error("GC unattended viewer - Failed to fetch config, status:", response.status);
+        console.error("GC interaction viewer - Failed to fetch config, status:", response.status);
         throw new Error('Failed to get config');
     }
-    console.log("GC unattended viewer - Successfully retrieved configuration");
+    console.log("GC interaction viewer - Successfully retrieved configuration");
     return response.json();
 }
 
 function getConversationId() {
-    console.log("GC unattended viewer - Extracting conversation ID from URL parameters");
+    console.log("GC interaction viewer - Extracting conversation ID from URL parameters");
     const urlParams = new URLSearchParams(window.location.search);
     const conversationId = urlParams.get('conversationId');
-    console.log("GC unattended viewer - Conversation ID found:", conversationId || 'none');
+    console.log("GC interaction viewer - Conversation ID found:", conversationId || 'none');
     return conversationId;
 }
 
 async function fetchConversationDetails(conversationId) {
-    console.log(`GC unattended viewer - Fetching conversation details for ${conversationId}`);
+    console.log(`GC interaction viewer - Fetching conversation details for ${conversationId}`);
     try {
         const conversationDetails = await conversationsApi.getAnalyticsConversationDetails(conversationId);
         return conversationDetails;
     } catch (error) {
-        console.error("GC unattended viewer - Failed to fetch conversation details:", error);
+        console.error("GC interaction viewer - Failed to fetch conversation details:", error);
         throw new Error('Failed to fetch conversation details: ' + error.message);
     }
 }
 
 async function fetchExternalContactSessions(contactId) {
-    console.log(`GC unattended viewer - Fetching external contact sessions for ${contactId}`);
+    console.log(`GC interaction viewer - Fetching external contact sessions for ${contactId}`);
     const opts = {
         'pageSize': '200'
     };
@@ -43,13 +43,13 @@ async function fetchExternalContactSessions(contactId) {
         const sessionsData = await journeyApi.getExternalcontactsContactJourneySessions(contactId, opts);
         return sessionsData;
     } catch (error) {
-        console.error("GC unattended viewer - Failed to fetch external contact sessions:", error);
+        console.error("GC interaction viewer - Failed to fetch external contact sessions:", error);
         throw new Error('Failed to fetch external contact sessions: ' + error.message);
     }
 }
 
 async function fetchTranscriptUrl(conversationId, communicationId) {
-    console.log(`GC unattended viewer - Fetching transcript URL for conversation ${conversationId}, communication ${communicationId}`);
+    console.log(`GC interaction viewer - Fetching transcript URL for conversation ${conversationId}, communication ${communicationId}`);
     try {
         const transcriptUrlData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl(conversationId, communicationId);
         return transcriptUrlData;
@@ -58,13 +58,13 @@ async function fetchTranscriptUrl(conversationId, communicationId) {
             console.warn("Transcript URL not found (404) for conversation:", conversationId, "communication:", communicationId);
             return null; // Return null to indicate no transcript URL found
         }
-        console.error("GC unattended viewer - Failed to fetch transcript URL:", error);
+        console.error("GC interaction viewer - Failed to fetch transcript URL:", error);
         throw new Error('Failed to fetch transcript URL: ' + error.message);
     }
 }
 
 async function fetchTranscriptData(transcriptUrl) {
-    console.log(`GC unattended viewer - Fetching transcript data from URL via /api/downloadTranscript`);
+    console.log(`GC interaction viewer - Fetching transcript data from URL via /api/downloadTranscript`);
     try {
         const response = await fetch(`/api/downloadTranscript?uri=${encodeURIComponent(transcriptUrl.url)}`, {
             headers: {
@@ -72,19 +72,19 @@ async function fetchTranscriptData(transcriptUrl) {
             }
         });
         if (!response.ok) {
-            console.error("GC unattended viewer - Failed to fetch transcript data, status:", response.status);
+            console.error("GC interaction viewer - Failed to fetch transcript data, status:", response.status);
             throw new Error(`Failed to fetch transcript data: ${response.status} ${response.statusText}`);
         }
         return await response.json();
     } catch (error) {
-        console.error("GC unattended viewer - Error fetching transcript data:", error);
+        console.error("GC interaction viewer - Error fetching transcript data:", error);
         throw new Error('Error fetching transcript data: ' + error.message);
     }
 }
 
 
 async function fetchConversationSummary(conversationId) {
-    console.log(`GC unattended viewer - Fetching conversation summary for ${conversationId}`);
+    console.log(`GC interaction viewer - Fetching conversation summary for ${conversationId}`);
     try {
         const summaryData = await conversationsApi.getConversationSummaries(conversationId);
         return summaryData;
@@ -93,7 +93,7 @@ async function fetchConversationSummary(conversationId) {
             console.warn("Conversation summary not found (404) for conversation:", conversationId);
             return null; // Return null to indicate no summary found
         }
-        console.error("GC unattended viewer - Failed to fetch conversation summary:", error);
+        console.error("GC interaction viewer - Failed to fetch conversation summary:", error);
         throw new Error('Failed to fetch conversation summary: ' + error.message);
     }
 }
@@ -255,7 +255,7 @@ function displayConversationHistory(sessionsByType) {
 
 
 async function initialize() {
-    console.log("GC unattended viewer - Starting application initialization");
+    console.log("GC interaction viewer - Starting application initialization");
     try {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
@@ -318,7 +318,7 @@ async function initialize() {
 
 
     } catch (error) {
-        console.error("GC unattended viewer - Initialization failed:", error);
+        console.error("GC interaction viewer - Initialization failed:", error);
         alert('Failed to initialize application: ' + error.message);
     }
 }
