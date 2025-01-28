@@ -56,7 +56,7 @@ async function fetchTranscriptUrl(conversationId, communicationId) {
     } catch (error) {
         if (error.status === 404) {
             console.warn("Transcript URL not found (404) for conversation:", conversationId, "communication:", communicationId);
-            return null; // Return null to indicate no transcript URL found
+            return null;
         }
         console.error("GC interaction viewer - Failed to fetch transcript URL:", error);
         throw new Error('Failed to fetch transcript URL: ' + error.message);
@@ -91,7 +91,7 @@ async function fetchConversationSummary(conversationId) {
     } catch (error) {
         if (error.status === 404) {
             console.warn("Conversation summary not found (404) for conversation:", conversationId);
-            return null; // Return null to indicate no summary found
+            return null;
         }
         console.error("GC interaction viewer - Failed to fetch conversation summary:", error);
         throw new Error('Failed to fetch conversation summary: ' + error.message);
@@ -123,7 +123,7 @@ function processTranscript(transcriptJson) {
 }
 
 
-function displayConversationHistory(sessionsByType) {
+async function displayConversationHistory(sessionsByType) {
     console.log('displayConversationHistory called', sessionsByType);
     const historyByTypeDiv = document.getElementById('historyByType');
     historyByTypeDiv.innerHTML = '';
@@ -178,15 +178,21 @@ function displayConversationHistory(sessionsByType) {
                         transcriptionSection.appendChild(transcriptContent);
 
                         try {
-                            const agentSession = session.agentSession;
-                            if (agentSession && agentSession.sessionId) {
-                                const transcriptUrlData = await fetchTranscriptUrl(session.id, agentSession.sessionId);
-                                if (transcriptUrlData) { // Check if transcriptUrlData is not null (404 handled)
+                            const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
+                            let agentCommunicationIdForTranscript = null;
+                            const agentParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'agent' || p.purpose === 'internal');
+                            if (agentParticipantForTranscript && agentParticipantForTranscript.sessions && agentParticipantForTranscript.sessions.length > 0) {
+                                agentCommunicationIdForTranscript = agentParticipantForTranscript.sessions[0].sessionId;
+                            }
+
+                            if (agentCommunicationIdForTranscript) {
+                                const transcriptUrlData = await fetchTranscriptUrl(session.id, agentCommunicationIdForTranscript);
+                                if (transcriptUrlData) {
                                     const transcriptData = await fetchTranscriptData(transcriptUrlData);
                                     const transcriptHTML = processTranscript(transcriptData);
                                     transcriptContent.innerHTML = transcriptHTML;
                                 } else {
-                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>'; // Display "No transcriptions available" for 404
+                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>'; 
                                 }
                             } else {
                                 transcriptContent.innerHTML = '<p>Agent session ID not found, cannot load transcript.</p>';
@@ -219,7 +225,7 @@ function displayConversationHistory(sessionsByType) {
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
-                            if (summaryData) { // Check if summaryData is not null (404 handled)
+                            if (summaryData) {
                                 const summaryText = summaryData.summary?.text || 'N/A';
                                 const reasonText = summaryData.summary?.reason?.text || 'N/A';
                                 const followupText = summaryData.summary?.followup?.text || 'N/A';
@@ -232,7 +238,7 @@ function displayConversationHistory(sessionsByType) {
                                     <p><strong>Resolution:</strong> ${resolutionText}</p>
                                 `;
                             } else {
-                                summaryContent.innerHTML = '<p>No summaries available.</p>'; // Display "No summaries available" for 404
+                                summaryContent.innerHTML = '<p>No summaries available.</p>';
                             }
                         } catch (error) {
                             console.error("Error loading summary:", error);
@@ -282,15 +288,6 @@ async function initialize() {
         }
 
 
-        let agentCommunicationId = null;
-        const agentParticipant = conversationDetails.participants.find(p => p.purpose === 'agent' || p.purpose === 'internal');
-        let agentSessionInfo = null;
-        if (agentParticipant && agentParticipant.sessions && agentParticipant.sessions.length > 0) {
-            agentSessionInfo = agentParticipant.sessions[0];
-            agentCommunicationId = agentSessionInfo.sessionId;
-        }
-
-
         const sessionsData = await fetchExternalContactSessions(externalContactId);
         console.log('sessionsData after fetchExternalContactSessions:', sessionsData);
         const relevantSessions = sessionsData.entities;
@@ -307,7 +304,6 @@ async function initialize() {
                 originatingDirection: session.originatingDirection,
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
-                agentSession: agentSessionInfo,
                 mediaType: mediaType
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
