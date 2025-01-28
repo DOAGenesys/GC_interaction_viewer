@@ -9,13 +9,19 @@ let relevantSessions = [];
 
 async function getConfig() {
     console.log("GC interaction viewer - Fetching configuration from /api/getConfig");
-    const response = await fetch('/api/getConfig');
-    if (!response.ok) {
-        console.error("GC interaction viewer - Failed to fetch config, status:", response.status);
-        throw new Error('Failed to get config');
+    try {
+        const response = await fetch('/api/getConfig');
+        if (!response.ok) {
+            console.error("GC interaction viewer - Failed to fetch config, status:", response.status);
+            throw new Error('Failed to get config');
+        }
+        console.log("GC interaction viewer - Successfully retrieved configuration");
+        return response.json();
+    } catch (error) {
+        console.error("GC interaction viewer - Error fetching config:", error);
+        displayErrorMessage('Failed to load configuration. Please check the console for details.');
+        throw error;
     }
-    console.log("GC interaction viewer - Successfully retrieved configuration");
-    return response.json();
 }
 
 function getConversationId() {
@@ -23,6 +29,9 @@ function getConversationId() {
     const urlParams = new URLSearchParams(window.location.search);
     const conversationId = urlParams.get('conversationId');
     console.log("GC interaction viewer - Conversation ID found:", conversationId || 'none');
+    if (!conversationId) {
+        displayErrorMessage('No conversation ID provided in the URL. Please provide a conversation ID to view details.');
+    }
     return conversationId;
 }
 
@@ -33,6 +42,7 @@ async function fetchConversationDetails(conversationId) {
         return conversationDetails;
     } catch (error) {
         console.error("GC interaction viewer - Failed to fetch conversation details:", error);
+        displayErrorMessage('Failed to fetch conversation details. Please check the console for details.');
         throw new Error('Failed to fetch conversation details: ' + error.message);
     }
 }
@@ -47,6 +57,7 @@ async function fetchExternalContactSessions(contactId) {
         return sessionsData;
     } catch (error) {
         console.error("GC interaction viewer - Failed to fetch external contact sessions:", error);
+        displayErrorMessage('Failed to fetch contact sessions. Please check the console for details.');
         throw new Error('Failed to fetch external contact sessions: ' + error.message);
     }
 }
@@ -62,6 +73,7 @@ async function fetchTranscriptUrl(conversationId, communicationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch transcript URL:", error);
+        displayErrorMessage('Failed to fetch transcript URL. Please check the console for details.');
         throw new Error('Failed to fetch transcript URL: ' + error.message);
     }
 }
@@ -81,6 +93,7 @@ async function fetchTranscriptData(transcriptUrl) {
         return await response.json();
     } catch (error) {
         console.error("GC interaction viewer - Error fetching transcript data:", error);
+        displayErrorMessage('Error fetching transcript data. Please check the console for details.');
         throw new Error('Error fetching transcript data: ' + error.message);
     }
 }
@@ -97,6 +110,7 @@ async function fetchConversationSummary(conversationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch conversation summary:", error);
+        displayErrorMessage('Failed to fetch conversation summary. Please check the console for details.');
         throw new Error('Failed to fetch conversation summary: ' + error.message);
     }
 }
@@ -112,6 +126,7 @@ async function fetchConversationAnalytics(conversationId) {
             return null;
         }
         console.error("GC interaction viewer - Failed to fetch conversation analytics:", error);
+        displayErrorMessage('Failed to fetch conversation analytics. Please check the console for details.');
         throw new Error('Failed to fetch conversation analytics: ' + error.message);
     }
 }
@@ -133,15 +148,15 @@ function processTranscript(transcriptJson, mediaType) {
                 const text = phrase.text;
 
                 if (mediaType === 'Email' && phrase.type === 'subject') {
-                    transcriptHTML += `<p><strong>Subject:</strong> ${text}</p>`;
+                    transcriptHTML += `<p class="transcript-subject"><strong>Subject:</strong> ${text}</p>`;
                 } else if (mediaType === 'Email' && phrase.type === 'body') {
-                    transcriptHTML += `<p>${text}</p>`;
+                    transcriptHTML += `<p class="transcript-body">${text}</p>`;
                 } else if (mediaType !== 'Email') { // For Voice and Message
                     if (participantPurpose !== currentParticipant) {
-                        transcriptHTML += `<p><strong>${participantPurpose.toUpperCase()}:</strong> ${text}</p>`;
+                        transcriptHTML += `<p class="transcript-speaker"><strong>${participantPurpose.toUpperCase()}:</strong></p><p class="transcript-text">${text}</p>`;
                         currentParticipant = participantPurpose;
                     } else {
-                        transcriptHTML += `<p>${text}</p>`;
+                        transcriptHTML += `<p class="transcript-text">${text}</p>`;
                     }
                 }
             });
@@ -175,17 +190,17 @@ function displayConversationAnalytics(analyticsData) {
         const sentimentScorePercentage = (analyticsData.sentimentScore * 100).toFixed(2);
         const sentimentTrendPercentage = analyticsData.sentimentTrendClass === 'NotCalculated' ? 'N/A' : (analyticsData.sentimentTrend * 100).toFixed(2) + '%';
         analyticsHTML += `
-            <p><strong>Sentiment Score:</strong> ${sentimentScorePercentage}%</p>
-            <p><strong>Sentiment Trend:</strong> ${sentimentTrendPercentage}</p>
+            <div class="analytics-item"><strong>Sentiment Score:</strong> ${sentimentScorePercentage}%</div>
+            <div class="analytics-item"><strong>Sentiment Trend:</strong> ${sentimentTrendPercentage}</div>
         `;
 
 
         if (analyticsData.empathyScores && analyticsData.empathyScores.length > 0) {
             analyticsData.empathyScores.forEach(empathyScore => {
-                analyticsHTML += `<p><strong>Empathy Score (User ${empathyScore.userId}):</strong> ${empathyScore.score}%</p>`;
+                analyticsHTML += `<div class="analytics-item"><strong>Empathy Score (User ${empathyScore.userId}):</strong> ${empathyScore.score}%</div>`;
             });
         } else {
-            analyticsHTML += `<p><strong>Empathy Score:</strong> N/A</p>`;
+            analyticsHTML += `<div class="analytics-item"><strong>Empathy Score:</strong> N/A</div>`;
         }
     } else {
         analyticsHTML = '<p>No analytics data available.</p>';
@@ -226,11 +241,27 @@ function applyStatusFilter(sessions, selectedStatuses) {
     });
 }
 
+function displayLoading(sectionContent) {
+    sectionContent.innerHTML = '<div class="loading-spinner"></div><p class="loading-text">Loading...</p>';
+}
+
+function displayErrorMessage(message) {
+    const historyByTypeDiv = document.getElementById('historyByType');
+    historyByTypeDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle error-icon"></i> ${message}</div>`;
+    historyByTypeDiv.style.display = 'block';
+}
+
 
 async function displayConversationHistory(sessionsByType) {
     console.log('displayConversationHistory called', sessionsByType);
     const historyByTypeDiv = document.getElementById('historyByType');
     historyByTypeDiv.innerHTML = '';
+
+    if (Object.keys(sessionsByType).length === 0) {
+        historyByTypeDiv.innerHTML = '<div class="no-sessions-message"><i class="fas fa-inbox-empty"></i> No conversations found for the selected criteria.</div>';
+        historyByTypeDiv.style.display = 'block';
+        return;
+    }
 
     const statusFilterDropdown = $('#status-filter');
     const selectedStatuses = statusFilterDropdown.val() || [];
@@ -245,8 +276,8 @@ async function displayConversationHistory(sessionsByType) {
         mediaTypeHeader.textContent = `${mediaType} Conversations`;
 
         const expandButton = document.createElement('button');
-        expandButton.textContent = 'Expand';
-        expandButton.classList.add('expand-collapse-button');
+        expandButton.innerHTML = '<i class="fas fa-expand-alt"></i> Expand';
+        expandButton.classList.add('expand-collapse-button', 'expand-button');
         expandButton.addEventListener('click', () => {
             mediaTypeSection.classList.remove('collapsed');
             collapseButton.style.display = 'inline-block';
@@ -254,8 +285,8 @@ async function displayConversationHistory(sessionsByType) {
         });
 
         const collapseButton = document.createElement('button');
-        collapseButton.textContent = 'Collapse';
-        collapseButton.classList.add('expand-collapse-button');
+        collapseButton.innerHTML = '<i class="fas fa-compress-alt"></i> Collapse';
+        collapseButton.classList.add('expand-collapse-button', 'collapse-button');
         collapseButton.style.display = 'none';
          collapseButton.addEventListener('click', () => {
             mediaTypeSection.classList.add('collapsed');
@@ -294,17 +325,17 @@ async function displayConversationHistory(sessionsByType) {
                 sessionHeader.classList.add('session-header');
                 let subjectOrType = '';
                  if (session.mediaType === 'Email' && session.conversationSubject) {
-                    subjectOrType = `<span>Subject: ${session.conversationSubject}</span>`;
+                    subjectOrType = `<span class="session-subject">Subject: ${session.conversationSubject}</span>`;
                 } else if (session.mediaType === 'Message' && session.messageType) {
-                    subjectOrType = `<span>Type: ${session.messageType}</span>`;
+                    subjectOrType = `<span class="session-type">Type: ${session.messageType}</span>`;
                 }
                 const createdDate = new Date(session.createdDate);
                 const formattedCreatedDate = createdDate.toLocaleString();
 
                 sessionHeader.innerHTML = `
                     <a href="https://apps.${window.environment}/directory/#/analytics/interactions/${session.id}/admin" target="_blank" class="conversation-id-link">${session.id}</a>
-                    <span>${session.originatingDirection}</span>
-                     <span>${formattedCreatedDate}</span>
+                    <span class="session-direction">${session.originatingDirection}</span>
+                     <span class="session-date">${formattedCreatedDate}</span>
                     ${subjectOrType}
                 `;
                 sessionItem.appendChild(sessionHeader);
@@ -315,16 +346,14 @@ async function displayConversationHistory(sessionsByType) {
                 const transcriptionSection = document.createElement('div');
                 transcriptionSection.classList.add('detail-section', 'collapsed');
                 const transcriptionHeader = document.createElement('h5');
-                transcriptionHeader.textContent = 'Transcription';
+                transcriptionHeader.innerHTML = '<i class="fas fa-file-alt section-detail-icon"></i> Transcription <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 transcriptionHeader.classList.add('section-header');
                 transcriptionHeader.addEventListener('click', async () => {
                     transcriptionSection.classList.toggle('collapsed');
-                    if (!transcriptionSection.dataset.transcriptLoaded) {
+                    const sectionContent = transcriptionSection.querySelector('.section-content');
+                    if (!transcriptionSection.dataset.transcriptLoaded && transcriptionSection.classList.contains('collapsed') === false) {
                         transcriptionSection.dataset.transcriptLoaded = 'true';
-                        const transcriptContent = document.createElement('div');
-                        transcriptContent.classList.add('section-content');
-                        transcriptContent.innerHTML = '<p>Loading transcription...</p>';
-                        transcriptionSection.appendChild(transcriptContent);
+                        displayLoading(sectionContent);
 
                         try {
                             const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
@@ -341,7 +370,7 @@ async function displayConversationHistory(sessionsByType) {
                                     const transcriptHTML = processTranscript(transcriptData, session.mediaType);
                                     transcriptContent.innerHTML = transcriptHTML;
                                 } else {
-                                    transcriptContent.innerHTML = '<p>No transcriptions available.</p>';
+                                    transcriptContent.innerHTML = '<p>No transcriptions available for this conversation.</p>';
                                 }
                             } else {
                                 transcriptContent.innerHTML = '<p>Customer session ID not found, cannot load transcript.</p>';
@@ -349,86 +378,87 @@ async function displayConversationHistory(sessionsByType) {
 
                         } catch (error) {
                             console.error("Error loading transcription:", error);
-                            transcriptContent.innerHTML = `<p>Error loading transcription: ${error.message}</p>`;
+                            transcriptContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading transcription: ${error.message}</div>`;
                         }
                     }
                 });
-                transcriptionSection.appendChild(transcriptionHeader);
+                const transcriptionContent = document.createElement('div');
+                transcriptionContent.classList.add('section-content');
+                transcriptionSection.appendChild(transcriptionContent);
                 detailsDiv.appendChild(transcriptionSection);
 
 
                 const summarySection = document.createElement('div');
                 summarySection.classList.add('detail-section', 'collapsed');
                 const summaryHeader = document.createElement('h5');
-                summaryHeader.textContent = 'Summary';
+                summaryHeader.innerHTML = '<i class="fas fa-clipboard-check section-detail-icon"></i> Summary <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 summaryHeader.classList.add('section-header');
 
                 summaryHeader.addEventListener('click', async () => {
                     summarySection.classList.toggle('collapsed');
-                    if (!summarySection.dataset.summaryLoaded) {
+                    const sectionContent = summarySection.querySelector('.section-content');
+                    if (!summarySection.dataset.summaryLoaded && summarySection.classList.contains('collapsed') === false) {
                         summarySection.dataset.summaryLoaded = 'true';
-                        const summaryContent = document.createElement('div');
-                        summaryContent.classList.add('section-content');
-                        summaryContent.innerHTML = '<p>Loading summary...</p>';
-                        summarySection.appendChild(summaryContent);
+                        displayLoading(sectionContent);
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
-                            if (summaryData) {
-                                const summaryText = summaryData.summary?.text || 'N/A';
-                                const reasonText = summaryData.summary?.reason?.text || 'N/A';
-                                const followupText = summaryData.summary?.followup?.text || 'N/A';
-                                const resolutionText = summaryData.summary?.resolution?.text || 'N/A';
+                            if (summaryData && summaryData.summary) {
+                                const summaryText = summaryData.summary.text ? `<p><strong>Summary:</strong> ${summaryData.summary.text}</p>` : '';
+                                const reasonText = summaryData.summary.reason && summaryData.summary.reason.text ? `<p><strong>Reason:</strong> ${summaryData.summary.reason.text}</p>` : '';
+                                const followupText = summaryData.summary.followup && summaryData.summary.followup.text ? `<p><strong>Follow up:</strong> ${summaryData.summary.followup.text}</p>` : '';
+                                const resolutionText = summaryData.summary.resolution && summaryData.summary.resolution.text ? `<p><strong>Resolution:</strong> ${summaryData.summary.resolution.text}</p>` : '';
 
                                 summaryContent.innerHTML = `
-                                    <p><strong>Summary:</strong> ${summaryText}</p>
-                                    <p><strong>Reason:</strong> ${reasonText}</p>
-                                    <p><strong>Follow up:</strong> ${followupText}</p>
-                                    <p><strong>Resolution:</strong> ${resolutionText}</p>
+                                    ${summaryText}
+                                    ${reasonText}
+                                    ${followupText}
+                                    ${resolutionText}
                                 `;
                             } else {
-                                summaryContent.innerHTML = '<p>No summaries available.</p>';
+                                summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
                             }
                         } catch (error) {
                             console.error("Error loading summary:", error);
-                            summaryContent.innerHTML = `<p>Error loading summary: ${error.message}</p>`;
+                            summaryContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading summary: ${error.message}</div>`;
                         }
                     }
                 });
-                summarySection.appendChild(summaryHeader);
+                const summaryContent = document.createElement('div');
+                summaryContent.classList.add('section-content');
+                summarySection.appendChild(summaryContent);
                 detailsDiv.appendChild(summarySection);
 
 
                 const analyticsSection = document.createElement('div');
                 analyticsSection.classList.add('detail-section', 'collapsed');
                 const analyticsHeader = document.createElement('h5');
-                analyticsHeader.textContent = 'Analytics';
+                analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 analyticsHeader.classList.add('section-header');
 
                 analyticsHeader.addEventListener('click', async () => {
                     analyticsSection.classList.toggle('collapsed');
-                    if (!analyticsSection.dataset.analyticsLoaded) {
+                    const sectionContent = analyticsSection.querySelector('.section-content');
+                    if (!analyticsSection.dataset.analyticsLoaded && analyticsSection.classList.contains('collapsed') === false) {
                         analyticsSection.dataset.analyticsLoaded = 'true';
-                        const analyticsContent = document.createElement('div');
-                        analyticsContent.classList.add('section-content');
-                        analyticsContent.innerHTML = '<p>Loading analytics...</p>';
-                        analyticsSection.appendChild(analyticsContent);
-
+                        displayLoading(sectionContent);
                         try {
                             const analyticsData = await fetchConversationAnalytics(session.id);
                             if (analyticsData) {
                                 const analyticsDisplayHTML = displayConversationAnalytics(analyticsData);
-                                analyticsContent.innerHTML = analyticsDisplayHTML;
+                                analyticsContent.innerHTML = `<div class="analytics-grid">${analyticsDisplayHTML}</div>`;
                             } else {
-                                analyticsContent.innerHTML = '<p>No analytics data available.</p>';
+                                analyticsContent.innerHTML = '<p>No analytics data available for this conversation.</p>';
                             }
                         } catch (error) {
                             console.error("Error loading analytics:", error);
-                            analyticsContent.innerHTML = `<p>Error loading analytics: ${error.message}</p>`;
+                            analyticsContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading analytics: ${error.message}</div>`;
                         }
                     }
                 });
-                analyticsSection.appendChild(analyticsHeader);
+                const analyticsContent = document.createElement('div');
+                analyticsContent.classList.add('section-content');
+                analyticsSection.appendChild(analyticsContent);
                 detailsDiv.appendChild(analyticsSection);
 
 
@@ -455,7 +485,7 @@ async function initialize() {
 
         const conversationId = getConversationId();
         if (!conversationId) {
-            throw new Error('No conversation ID provided in URL parameters.');
+            return; // Stop initialization if no conversation ID
         }
 
         const conversationDetails = await fetchConversationDetails(conversationId);
@@ -509,14 +539,15 @@ async function initialize() {
 
 
          $('#status-filter').select2({
-            placeholder: "Select a status",
-            allowClear: true
+            placeholder: "Select statuses",
+            allowClear: true,
+            width: '100%'
          });
 
         $('#status-filter').on('change', function () {
 
              const selectedStatuses = $(this).val();
-             const filteredSessions = applyStatusFilter(allSessions, selectedStatuses);
+             const filteredSessions = applyStatusFilter(relevantSessions, selectedStatuses);
 
              const sessionsByType = {};
              filteredSessions.forEach(session => {
@@ -545,7 +576,7 @@ async function initialize() {
 
     } catch (error) {
         console.error("GC interaction viewer - Initialization failed:", error);
-        alert('Failed to initialize application: ' + error.message);
+        displayErrorMessage('Failed to initialize application. Please check the console for details.');
     }
 }
 
