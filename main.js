@@ -37,7 +37,7 @@ async function fetchConversationDetails(conversationId) {
 async function fetchExternalContactSessions(contactId) {
     console.log(`Interaction Viewer - Fetching external contact sessions for ${contactId}`);
     const opts = {
-        'pageSize': '200' // Maximum page size
+        'pageSize': '200'
     };
     try {
         const sessionsData = await journeyApi.getExternalcontactsContactJourneySessions(contactId, opts);
@@ -116,10 +116,12 @@ function processTranscript(transcriptJson) {
 
 
 function displayConversationHistory(sessionsByType) {
+    console.log('displayConversationHistory called', sessionsByType);
     const historyByTypeDiv = document.getElementById('historyByType');
     historyByTypeDiv.innerHTML = '';
 
     for (const mediaType in sessionsByType) {
+        console.log('Processing mediaType:', mediaType, sessionsByType[mediaType]);
         const mediaTypeSection = document.createElement('div');
         mediaTypeSection.classList.add('media-type-section');
 
@@ -128,13 +130,15 @@ function displayConversationHistory(sessionsByType) {
         mediaTypeSection.appendChild(mediaTypeHeader);
 
         const sessions = sessionsByType[mediaType];
-        if (sessions.length === 0) {
+        console.log('Sessions for mediaType', mediaType, ':', sessions);
+        if (!sessions || sessions.length === 0) {
             const noSessionsMessage = document.createElement('p');
             noSessionsMessage.textContent = `No ${mediaType} conversations found.`;
             mediaTypeSection.appendChild(noSessionsMessage);
         } else {
             const sessionsList = document.createElement('ul');
             sessions.forEach(session => {
+                console.log('Processing session:', session);
                 const sessionItem = document.createElement('li');
                 sessionItem.classList.add('session-item');
 
@@ -151,7 +155,6 @@ function displayConversationHistory(sessionsByType) {
                 const detailsDiv = document.createElement('div');
                 detailsDiv.classList.add('session-details');
 
-                // Transcription Section
                 const transcriptionSection = document.createElement('div');
                 transcriptionSection.classList.add('detail-section', 'collapsed');
                 const transcriptionHeader = document.createElement('h5');
@@ -187,7 +190,6 @@ function displayConversationHistory(sessionsByType) {
                 detailsDiv.appendChild(transcriptionSection);
 
 
-                // Summary Section
                 const summarySection = document.createElement('div');
                 summarySection.classList.add('detail-section', 'collapsed');
                 const summaryHeader = document.createElement('h5');
@@ -260,8 +262,7 @@ async function initialize() {
             externalContactId = customerParticipant.externalContactId;
         } else {
             console.warn("Customer or external contact ID not found, using default.");
-            // Fallback if externalContactId is not reliably found. Consider other identifiers if available.
-            externalContactId = customerParticipant?.participantId; // Using participantId as fallback, might not be ideal.
+            externalContactId = customerParticipant?.participantId;
         }
 
 
@@ -297,6 +298,7 @@ async function initialize() {
             sessionsByType[mediaType].push(sessionDisplayInfo);
         });
 
+        console.log('sessionsByType:', sessionsByType);
         displayConversationHistory(sessionsByType);
 
 
