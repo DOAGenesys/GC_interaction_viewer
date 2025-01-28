@@ -5,11 +5,24 @@
     <script src="https://sdk-cdn.mypurecloud.com/javascript/213.1.0/purecloud-platform-client-v2.min.js"></script>
     <script src="https://sdk-cdn.mypurecloud.com/client-apps/2.6.3/purecloud-client-app-sdk-de77761d.min.js"></script>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
     <div class="container">
         <div id="conversationHistory">
             <h3>Conversation History</h3>
+            <div id="filter-container">
+                <label for="status-filter">Filter by Status:</label>
+                <select id="status-filter" multiple="multiple" style="width: 100%;">
+                    <option value="all">All</option>
+                    <option value="onFlow">On flow</option>
+                    <option value="onQueue">On queue</option>
+                    <option value="attended">Attended</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
             <div id="historyByType"></div>
         </div>
     </div>
