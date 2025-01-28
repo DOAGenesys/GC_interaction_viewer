@@ -1,21 +1,21 @@
-function startGCSDKs() {
+function startGCSDKs(clientId) {
     const console = window.console;
-    return new Promise(async (resolve, reject) => {
-        const appName = 'Interaction Viewer';
+    return new Promise((resolve, reject) => {
+        const appName = 'Speed dial app';
         const qParamLanguage = 'langTag';
         const qParamGcHostOrigin = 'gcHostOrigin';
         const qParamEnvironment = 'gcTargetEnv';
-        let language = '';
+        let language = '';  
+        let redirectUri = 'https://gc-unattended-conversations.vercel.app';
         let userDetails = null;
         let gcHostOrigin = '';
-        await assignConfiguration();
+        assignConfiguration();
 
         const hostName = new URL(gcHostOrigin).hostname;
         const parts = hostName.split('.');
         parts.shift();
-        window.environment = parts.join('.'); //example enviroment value = "mypurecloud.ie"
+        window.environment = parts.join('.'); //example enviroment value = "mypurecloud.ie" 
         console.log('window.environment in startGCSDKs:', window.environment);
-        console.log('window.redirectUri in startGCSDKs:', window.redirectUri);
 
         const platformClient = require('platformClient');
         const client = platformClient.ApiClient.instance;
@@ -34,16 +34,18 @@ function startGCSDKs() {
         let myClientApp = new ClientApp({
             pcEnvironment: window.environment
         });
+        window.myClientApp = myClientApp; 
         client.setPersistSettings(true, appName);
         client.setEnvironment(window.environment);
-        client.loginImplicitGrant(window.clientId, window.redirectUri)
+        client.loginImplicitGrant(clientId, redirectUri)
             .then(data => usersApi.getUsersMe())
-            .then(data => {
+            .then(data => {   
                 userDetails = data;
             })
             .then(() => {
                 document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('span_environment').innerText = window.environment;
+                    document.getElementById('span_language').innerText = language;
                     document.getElementById('span_name').innerText = userDetails.name;
                 });
                 resolve(platformClient);
@@ -54,41 +56,42 @@ function startGCSDKs() {
             });
 
         function assignConfiguration() {
-            return new Promise((resolve) => {
-                let browser_url = new URL(window.location);
-                let searchParams = new URLSearchParams(browser_url.search);
-                if (searchParams.has(qParamLanguage)) {
-                    language = searchParams.get(qParamLanguage);
-                    localStorage.setItem(`${appName}_language`, language);
-                    console.log('Language set from URL parameter:', language);
+            let browser_url = new URL(window.location);
+            let searchParams = new URLSearchParams(browser_url.search);
+            console.log('browser_url: ', browser_url);
+            console.log('searchParams: ', searchParams);
+            
+            if (searchParams.has(qParamLanguage)) {
+                language = searchParams.get(qParamLanguage);
+                localStorage.setItem(`${appName}_language`, language);
+                console.log('Language set from URL parameter:', language);
+            } else {
+                let local_lang = localStorage.getItem(`${appName}_language`);
+                if (local_lang) {
+                    language = local_lang;
+                    console.log('Language set from localStorage:', language);
                 } else {
-                    let local_lang = localStorage.getItem(`${appName}_language`);
-                    if (local_lang) {
-                        language = local_lang;
-                        console.log('Language set from localStorage:', language);
-                    } else {
-                        console.log('Language not found in both URL parameters and localStorage.');
-                    }
+                    console.log('Language not found in both URL parameters and localStorage.');
                 }
-                if (searchParams.has(qParamGcHostOrigin)) {
-                    gcHostOrigin = searchParams.get(qParamGcHostOrigin);
-                    localStorage.setItem(`${appName}_gcHostOrigin`, gcHostOrigin);
-                    console.log('gcHostOrigin set from URL parameter:', gcHostOrigin);
+            }
+            if (searchParams.has(qParamGcHostOrigin)) {
+                gcHostOrigin = searchParams.get(qParamGcHostOrigin);
+                localStorage.setItem(`${appName}_gcHostOrigin`, gcHostOrigin);
+                console.log('gcHostOrigin set from URL parameter:', gcHostOrigin);
+            } else {
+                let local_gcHostOrigin = localStorage.getItem(`${appName}_gcHostOrigin`);
+                if (local_gcHostOrigin) {
+                    gcHostOrigin = local_gcHostOrigin;
+                    console.log('gcHostOrigin set from localStorage:', gcHostOrigin);
                 } else {
-                    let local_gcHostOrigin = localStorage.getItem(`${appName}_gcHostOrigin`);
-                    if (local_gcHostOrigin) {
-                        gcHostOrigin = local_gcHostOrigin;
-                        console.log('gcHostOrigin set from localStorage:', gcHostOrigin);
-                    } else {
-                        console.log('gcHostOrigin not found in both URL parameters and localStorage.');
-                    }
+                    console.log('gcHostOrigin not found in both URL parameters and localStorage.');
                 }
-                for (let pair of searchParams.entries()) {
-                    console.log(pair[0] + ': ' + pair[1]);
-                }
-                console.log('Returning gcHostOrigin:', gcHostOrigin);
-                resolve(gcHostOrigin);
-            });
+            }
+            for (let pair of searchParams.entries()) {
+                console.log(pair[0] + ': ' + pair[1]); 
+            }
+            console.log('Returning gcHostOrigin:', gcHostOrigin);
+            return gcHostOrigin;
         }
     });
 }
