@@ -230,7 +230,7 @@ async function displayConversationHistory(sessionsByType) {
                 const transcriptionSection = document.createElement('div');
                 transcriptionSection.classList.add('detail-section', 'collapsed');
                 const transcriptionHeader = document.createElement('h5');
-                transcriptionHeader.textContent = 'Transcription';
+                transcriptionHeader.textContent = 'Transcription and Analytics';
                 transcriptionHeader.classList.add('section-header');
                 transcriptionHeader.addEventListener('click', async () => {
                     transcriptionSection.classList.toggle('collapsed');
