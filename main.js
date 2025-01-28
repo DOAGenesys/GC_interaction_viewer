@@ -351,7 +351,8 @@ async function displayConversationHistory(sessionsByType) {
                 transcriptionHeader.addEventListener('click', async () => {
                     transcriptionSection.classList.toggle('collapsed');
                     const sectionContent = transcriptionSection.querySelector('.section-content');
-                    if (!transcriptionSection.dataset.transcriptLoaded) { // Removed: && transcriptionSection.classList.contains('collapsed') === false
+                    if (!transcriptionSection.dataset.transcriptLoaded) {
+                        console.log("Loading transcript for session:", session.id, transcriptionSection.dataset.transcriptLoaded);
                         transcriptionSection.dataset.transcriptLoaded = 'true';
                         displayLoading(sectionContent);
 
@@ -369,6 +370,7 @@ async function displayConversationHistory(sessionsByType) {
                                     const transcriptData = await fetchTranscriptData(transcriptUrlData);
                                     const transcriptHTML = processTranscript(transcriptData, session.mediaType);
                                     transcriptContent.innerHTML = transcriptHTML;
+                                    console.log("Transcript HTML content:", transcriptHTML);
                                 } else {
                                     transcriptContent.innerHTML = '<p>No transcriptions available for this conversation.</p>';
                                 }
@@ -397,7 +399,8 @@ async function displayConversationHistory(sessionsByType) {
                 summaryHeader.addEventListener('click', async () => {
                     summarySection.classList.toggle('collapsed');
                     const sectionContent = summarySection.querySelector('.section-content');
-                    if (!summarySection.dataset.summaryLoaded) { // Removed: && summarySection.classList.contains('collapsed') === false
+                    if (!summarySection.dataset.summaryLoaded) {
+                        console.log("Loading summary for session:", session.id, summarySection.dataset.summaryLoaded);
                         summarySection.dataset.summaryLoaded = 'true';
                         displayLoading(sectionContent);
 
@@ -415,6 +418,7 @@ async function displayConversationHistory(sessionsByType) {
                                     ${followupText}
                                     ${resolutionText}
                                 `;
+                                console.log("Summary HTML content:", summaryContent.innerHTML);
                             } else {
                                 summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
                             }
@@ -439,7 +443,8 @@ async function displayConversationHistory(sessionsByType) {
                 analyticsHeader.addEventListener('click', async () => {
                     analyticsSection.classList.toggle('collapsed');
                     const sectionContent = analyticsSection.querySelector('.section-content');
-                    if (!analyticsSection.dataset.analyticsLoaded) { // Removed: && analyticsSection.classList.contains('collapsed') === false
+                    if (!analyticsSection.dataset.analyticsLoaded) {
+                        console.log("Loading analytics for session:", session.id, analyticsSection.dataset.analyticsLoaded);
                         analyticsSection.dataset.analyticsLoaded = 'true';
                         displayLoading(sectionContent);
                         try {
@@ -447,6 +452,7 @@ async function displayConversationHistory(sessionsByType) {
                             if (analyticsData) {
                                 const analyticsDisplayHTML = displayConversationAnalytics(analyticsData);
                                 analyticsContent.innerHTML = `<div class="analytics-grid">${analyticsDisplayHTML}</div>`;
+                                console.log("Analytics HTML content:", analyticsDisplayHTML);
                             } else {
                                 analyticsContent.innerHTML = '<p>No analytics data available for this conversation.</p>';
                             }
