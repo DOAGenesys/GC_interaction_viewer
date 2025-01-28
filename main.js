@@ -82,6 +82,12 @@ async function fetchTranscriptData(transcriptUrl) {
 async function fetchConversationSummary(conversationId) {
     console.log(`GC unattended viewer - Fetching conversation summary for ${conversationId}`);
     try {
+        // Debugging logs to inspect conversationsApi
+        console.log('typeof conversationsApi:', typeof conversationsApi);
+        console.log('conversationsApi:', conversationsApi);
+        console.log('ConversationsApi constructor:', platformClient.ConversationsApi);
+
+
         const summaryData = await conversationsApi.getConversationSummaries(conversationId);
         return summaryData;
     } catch (error) {
@@ -244,9 +250,16 @@ async function initialize() {
         config = await getConfig();
         platformClient = await startGCSDKs(config.clientId);
 
+        console.log('typeof platformClient after startGCSDKs:', typeof platformClient);
+        console.log('platformClient after startGCSDKs:', platformClient);
+
+
         conversationsApi = new platformClient.ConversationsApi();
         journeyApi = new platformClient.JourneyApi();
         speechTextAnalyticsApi = new platformClient.SpeechTextAnalyticsApi();
+
+        // Debug log to inspect ConversationsApi constructor
+        console.log('platformClient.ConversationsApi constructor:', platformClient.ConversationsApi);
 
 
         const conversationId = getConversationId();
