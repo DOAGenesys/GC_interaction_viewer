@@ -36,8 +36,8 @@ async function fetchConversationDetails(conversationId) {
 
 async function fetchExternalContactSessions(contactId) {
     console.log(`GC interaction viewer - Fetching external contact sessions for ${contactId}`);
-    let opts = { 
-          "includeMerged": true
+    let opts = {
+        "includeMerged": true
     };
     try {
         const sessionsData = await journeyApi.getExternalcontactsContactJourneySessions(contactId, opts);
@@ -152,11 +152,18 @@ async function displayConversationHistory(sessionsByType) {
 
                 const sessionHeader = document.createElement('div');
                 sessionHeader.classList.add('session-header');
+                let subjectOrType = '';
+                if (session.mediaType === 'Email' && session.conversationSubject) {
+                    subjectOrType = `<span>Subject: ${session.conversationSubject}</span>`;
+                } else if (session.mediaType === 'Message' && session.messageType) {
+                    subjectOrType = `<span>Type: ${session.messageType}</span>`;
+                }
+
                 sessionHeader.innerHTML = `
                     <a href="https://apps.${window.environment}/directory/#/analytics/interactions/${session.id}/admin" target="_blank" class="conversation-id-link">${session.id}</a>
                     <span>${session.originatingDirection}</span>
                     <span>${session.createdDate}</span>
-                    ${session.conversationSubject ? `<span>Subject: ${session.conversationSubject}</span>` : ''}
+                    ${subjectOrType}
                 `;
                 sessionItem.appendChild(sessionHeader);
 
@@ -290,12 +297,22 @@ async function initialize() {
 
         const sessionsData = await fetchExternalContactSessions(externalContactId);
         console.log('sessionsData after fetchExternalContactSessions:', sessionsData);
-        const relevantSessions = sessionsData.entities;
+        let relevantSessions = sessionsData.entities;
+
+        relevantSessions = relevantSessions.filter(session => {
+            if (!session.conversationChannels || session.conversationChannels.length === 0) {
+                return false;
+            }
+            const mediaType = session.conversationChannels[0].type;
+            return ['Voice', 'Message', 'Email'].includes(mediaType);
+        });
+
+
         console.log('relevantSessions after filter:', relevantSessions);
 
         const sessionsByType = {};
         relevantSessions.forEach(session => {
-            const mediaType = session.conversationChannels[0]?.type || 'Unknown Media Type';
+            const mediaType = session.conversationChannels[0].type;
             if (!sessionsByType[mediaType]) {
                 sessionsByType[mediaType] = [];
             }
@@ -304,7 +321,8 @@ async function initialize() {
                 originatingDirection: session.originatingDirection,
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
-                mediaType: mediaType
+                mediaType: mediaType,
+                messageType: session.conversationChannels[0].messageType // Add messageType
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
         });
