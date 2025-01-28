@@ -351,7 +351,7 @@ async function displayConversationHistory(sessionsByType) {
                 transcriptionHeader.addEventListener('click', async () => {
                     transcriptionSection.classList.toggle('collapsed');
                     const sectionContent = transcriptionSection.querySelector('.section-content');
-                    if (!transcriptionSection.dataset.transcriptLoaded && transcriptionSection.classList.contains('collapsed') === false) {
+                    if (!transcriptionSection.dataset.transcriptLoaded) { // Removed: && transcriptionSection.classList.contains('collapsed') === false
                         transcriptionSection.dataset.transcriptLoaded = 'true';
                         displayLoading(sectionContent);
 
@@ -397,7 +397,7 @@ async function displayConversationHistory(sessionsByType) {
                 summaryHeader.addEventListener('click', async () => {
                     summarySection.classList.toggle('collapsed');
                     const sectionContent = summarySection.querySelector('.section-content');
-                    if (!summarySection.dataset.summaryLoaded && summarySection.classList.contains('collapsed') === false) {
+                    if (!summarySection.dataset.summaryLoaded) { // Removed: && summarySection.classList.contains('collapsed') === false
                         summarySection.dataset.summaryLoaded = 'true';
                         displayLoading(sectionContent);
 
@@ -439,7 +439,7 @@ async function displayConversationHistory(sessionsByType) {
                 analyticsHeader.addEventListener('click', async () => {
                     analyticsSection.classList.toggle('collapsed');
                     const sectionContent = analyticsSection.querySelector('.section-content');
-                    if (!analyticsSection.dataset.analyticsLoaded && analyticsSection.classList.contains('collapsed') === false) {
+                    if (!analyticsSection.dataset.analyticsLoaded) { // Removed: && analyticsSection.classList.contains('collapsed') === false
                         analyticsSection.dataset.analyticsLoaded = 'true';
                         displayLoading(sectionContent);
                         try {
