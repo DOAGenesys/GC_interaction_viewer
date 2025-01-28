@@ -4,6 +4,7 @@ let conversationsApi = null;
 let journeyApi = null;
 let speechTextAnalyticsApi = null;
 let allSessions = [];
+let relevantSessions = [];
 
 
 async function getConfig() {
@@ -193,24 +194,28 @@ function displayConversationAnalytics(analyticsData) {
 }
 
 
+function getSessionStatus(session) {
+    if (session.lastEvent && session.lastEvent.eventName) {
+        const eventName = session.lastEvent.eventName;
+        if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent" || eventName === "com.genesys.analytics.detailevents.AcdStartEvent") {
+            return 'unattended';
+        } else if (eventName === "com.genesys.analytics.detailevents.AcdEndEvent" || eventName === "com.genesys.analytics.detailevents.AfterCallWorkEvent") {
+            return 'attended';
+        } else {
+            return 'other';
+        }
+    }
+    return 'other';
+}
+
+
 function applyStatusFilter(sessions, selectedStatuses) {
     if (!selectedStatuses || selectedStatuses.length === 0 || selectedStatuses.includes('all')) {
         return sessions;
     }
 
     return sessions.filter(session => {
-        let sessionStatus = 'other'; // Default status
-
-        if (session.lastEvent && session.lastEvent.eventName) {
-            const eventName = session.lastEvent.eventName;
-             if (eventName === "com.genesys.analytics.detailevents.FlowStartEvent" || eventName === "com.genesys.analytics.detailevents.AcdStartEvent") {
-                 sessionStatus = 'unattended';
-             } else if (eventName === "com.genesys.analytics.detailevents.AcdEndEvent" || eventName === "com.genesys.analytics.detailevents.AfterCallWorkEvent") {
-                 sessionStatus = 'attended';
-             }
-
-        }
-
+        const sessionStatus = getSessionStatus(session);
         return selectedStatuses.includes(sessionStatus);
     });
 }
@@ -428,6 +433,7 @@ async function displayConversationHistory(sessionsByType) {
         }
         historyByTypeDiv.appendChild(mediaTypeSection);
     }
+    historyByTypeDiv.style.display = 'block';
 }
 
 async function initialize() {
@@ -463,9 +469,7 @@ async function initialize() {
          allSessions = sessionsData.entities;
 
 
-        let relevantSessions = allSessions;
-
-        relevantSessions = relevantSessions.filter(session => {
+        relevantSessions = allSessions.filter(session => {
             if (!session.conversationChannels || session.conversationChannels.length === 0) {
                 return false;
             }
@@ -488,7 +492,7 @@ async function initialize() {
                 conversationSubject: session.conversationSubject,
                 createdDate: session.createdDate,
                 mediaType: mediaType,
-                messageType: session.conversationChannels[0].messageType, // Add messageType
+                messageType: session.conversationChannels[0].messageType,
                 lastEvent: session.lastEvent
             };
             sessionsByType[mediaType].push(sessionDisplayInfo);
@@ -510,6 +514,9 @@ async function initialize() {
 
              const sessionsByType = {};
              filteredSessions.forEach(session => {
+                 if (!session.conversationChannels || !Array.isArray(session.conversationChannels) || session.conversationChannels.length === 0) {
+                    return;
+                 }
                 const mediaType = session.conversationChannels[0].type;
                 if (!sessionsByType[mediaType]) {
                     sessionsByType[mediaType] = [];
@@ -520,7 +527,7 @@ async function initialize() {
                     conversationSubject: session.conversationSubject,
                     createdDate: session.createdDate,
                     mediaType: mediaType,
-                    messageType: session.conversationChannels[0].messageType, // Add messageType
+                    messageType: session.conversationChannels[0].messageType,
                     lastEvent: session.lastEvent
                 };
                 sessionsByType[mediaType].push(sessionDisplayInfo);
