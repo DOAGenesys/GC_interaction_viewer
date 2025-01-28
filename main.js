@@ -1,3 +1,4 @@
+// main.js
 let config = null;
 let platformClient = null;
 let conversationsApi = null;
@@ -169,19 +170,20 @@ function processTranscript(transcriptJson, mediaType) {
 function displayConversationAnalytics(analyticsData) {
     let analyticsHTML = '';
     if (analyticsData) {
-        if (analyticsData.sentimentScore !== undefined && analyticsData.sentimentTrend !== undefined) {
-            const sentimentScorePercentage = (analyticsData.sentimentScore * 100).toFixed(2);
-            const sentimentTrendPercentage = (analyticsData.sentimentTrend * 100).toFixed(2);
-            analyticsHTML += `
-                <p><strong>Sentiment Score:</strong> ${sentimentScorePercentage}%</p>
-                <p><strong>Sentiment Trend:</strong> ${sentimentTrendPercentage}%</p>
-            `;
-        }
+        const sentimentScorePercentage = (analyticsData.sentimentScore * 100).toFixed(2);
+        const sentimentTrendPercentage = analyticsData.sentimentTrendClass === 'NotCalculated' ? 'N/A' : (analyticsData.sentimentTrend * 100).toFixed(2) + '%';
+        analyticsHTML += `
+            <p><strong>Sentiment Score:</strong> ${sentimentScorePercentage}%</p>
+            <p><strong>Sentiment Trend:</strong> ${sentimentTrendPercentage}</p>
+        `;
+
 
         if (analyticsData.empathyScores && analyticsData.empathyScores.length > 0) {
             analyticsData.empathyScores.forEach(empathyScore => {
                 analyticsHTML += `<p><strong>Empathy Score (User ${empathyScore.userId}):</strong> ${empathyScore.score}%</p>`;
             });
+        } else {
+            analyticsHTML += `<p><strong>Empathy Score:</strong> N/A</p>`;
         }
     } else {
         analyticsHTML = '<p>No analytics data available.</p>';
