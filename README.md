@@ -1,211 +1,55 @@
-# TAS Vet ROTA Dialer
+# Genesys Cloud Unattended Interaction Viewer
 
-A Genesys Cloud integration widget that enables automated dialing to on-call veterinarians based on the current rota schedule.
+## Description
 
-## Overview
+The Genesys Cloud Interaction Viewer is a web application designed to display a historical view of customer interactions within Genesys Cloud. Starting with a specific conversation ID, the application retrieves and presents related interaction details, including:
 
-### Workflow
-When a callback interaction is initiated, the widget automatically:
-1. Retrieves the callback information, including customer data and the associated queue
-2. Queries the AWS "GC_TAS_ROTA_Demo" dynamoDB table to determine the correct veterinarian to be contacted based on the current datetime
-3. Presents this information in the widget's user interface
-4. When an agent clicks the Dial button, it places an outbound call to the veterinarian on behalf of the queue used for the callback
+*   **Conversation History:** Lists recent conversations associated with the customer involved in the initial conversation.
+*   **Conversation Details:** For each conversation, it displays key information like ID, direction, subject (for emails), and creation date.
+*   **Transcription (On Demand):** Allows users to expand and view the transcript of a conversation.
+*   **Summary (On Demand):** Provides a summary, reason, follow-up, and resolution of the conversation.
+*   **Direct Link to Interaction:**  Conversation IDs are clickable links that open the interaction in the Genesys Cloud Admin UI in a new tab.
 
-This application is a Genesys Cloud widget that integrates with an AWS backend to fetch active veterinarian details and facilitate direct dialing. It's designed to work within the Genesys Cloud interface, allowing agents to quickly connect customers with the currently on-call veterinarian.
+This tool helps agents and administrators quickly understand the context of a customer interaction by providing a consolidated view of their recent engagement history and conversation insights.
 
-## Required Configuration
+## Features
 
-### Genesys Cloud Phone Settings
-- "Phone Settings" > "Placing calls with another app?" must be enabled in the GC UI
+*   **View Conversation History:** Retrieve and display a list of recent conversations for a customer, categorized by media type (e.g., Email, Voice).
+*   **Filter by Interaction Type:**  Focus on conversations initiated by flows or queues, filtering out other event types.
+*   **On-Demand Transcription:** Fetch and display conversation transcripts only when needed, improving initial load times.
+*   **Conversation Summary:** Access and display conversation summaries, including reason, follow-up, and resolution details, on demand.
+*   **Genesys Cloud UI Aligned Styling:**  The application's styling is designed to be visually consistent with the Genesys Cloud user interface for a seamless user experience.
+*   **Direct Interaction Link:**  Easily navigate to the full interaction details in Genesys Cloud for deeper analysis.
+*   **Modular Codebase:**  Well-structured code with separate files for API calls and UI logic for maintainability and scalability.
 
-### AWS Backend Configuration
-- A REST API endpoint must be deployed on AWS API Gateway
-- The API Gateway endpoint must be configured to invoke a Lambda function
-- The Lambda function should be set up to query the "GC_TAS_ROTA_Demo" DynamoDB table
-- The Lambda function should use appropriate IAM roles with permissions to:
-  - Read from the DynamoDB table
-  - Execute within the API Gateway context
-  - Access any necessary AWS resources
+## Prerequisites
 
-## Technical Architecture
+Before you begin, ensure you have the following installed:
 
-### Components
+*   **Node.js and npm:**  Node.js is required to run the development server and manage project dependencies. npm (Node Package Manager) comes bundled with Node.js. You can download them from [https://nodejs.org/](https://nodejs.org/).
+*   **Genesys Cloud Account:** You need access to a Genesys Cloud organization to use this application.
+*   **Genesys Cloud OAuth Client:** You will need to create an OAuth Client in your Genesys Cloud organization with **Implicit Grant** type.  Make sure to configure the **Redirect URI** for your application (e.g., `http://localhost:8080` if running locally). You will need the **Client ID** from this OAuth client.
 
-1. **Frontend Application**
-   - Runs as a Genesys Cloud interaction widget
-   - Integrates with Genesys Cloud JavaScript and client app SDKs
-   - Communicates with AWS backend via API endpoints
+2.  **Configure Environment Variables:**
+    You need to set the following environment variables.  For local development, you can either set them directly in your terminal session or use a `.env` file in the project root (you will need to install `dotenv` if you choose to use a `.env` file and load it in your server-side code, though this example is client-side only, so adjust accordingly based on your serving method).
 
-2. **Backend Integration**
-   - AWS API Gateway endpoints
-   - Lambda function for business logic
-   - DynamoDB table for data storage
-   - Environment-based configuration
-   - Secure API key authentication
+    *   `GC_OAUTH_CLIENT_ID`:  Your Genesys Cloud OAuth Client ID (Implicit Grant).
+    *   `REDIRECT_URI`: The Redirect URI you configured in your Genesys Cloud OAuth Client to allow this app.
+  
+## Running Instructions
 
-3. **AWS Lambda Function**
-   - Queries "GC_TAS_ROTA_Demo" DynamoDB table
-   - Processes datetime-based lookups
-   - Returns formatted veterinarian data
-   - Implements error handling and logging
+1.  **View Interaction Details:** The application will load, authenticate with Genesys Cloud, and display the conversation history and details for the provided conversation ID.
 
-## API Flows
+    *   **Conversation List:**  Recent conversations will be grouped by media type.
+    *   **Expandable Sections:** Click on "Transcription" and "Summary" headers to expand and load these sections on demand.
+    *   **Conversation ID Links:** Click on the conversation IDs to open the interaction in Genesys Cloud Admin UI in a new tab.
 
-### 1. Application Initialization
+## API Endpoints
 
-```mermaid
-sequenceDiagram
-    participant UI as UI
-    participant GC as Genesys Cloud
-    participant AWS API Gateway as AWS API Gateway
-    
-    rect rgb(40, 44, 52)
-        UI->>+GC: Implicit Grant Authentication
-        Note over UI,GC: OAuth 2.0 flow begins
-        GC->>-UI: Return authentication token
-        
-        UI->>+GC: Get User Details (getUsersMe)
-        GC->>-UI: Return current user information
-        
-        UI->>+GC: Get Conversation Details
-        Note over UI,GC: Using conversationId from URL
-        GC->>-UI: Return conversation participants & queue info
-        
-        UI->>+AWS API Gateway: Fetch Active Vet Details
-        Note over UI,AWS API Gateway: Using current datetime
-        AWS API Gateway->>+Lambda: Invoke Lambda function
-        Lambda->>+DynamoDB: Query table
-        DynamoDB->>-Lambda: Return vet data
-        Lambda->>-AWS API Gateway: Process and return data
-        AWS API Gateway->>-UI: Return on-call vet contact info
-        
-        UI->>UI: Update Interface
-        Note over UI: Populate form fields<br/>Enable/disable dial button
-    end
-```
+The application utilizes the following backend API endpoints (implemented as serverless functions or similar in a real-world deployment) to interact with Genesys Cloud APIs:
 
-### 2. Genesys Cloud API Endpoints Used
-
-#### Authentication
-- **Endpoint**: Implicit Grant OAuth 2.0
-- **Purpose**: Initial authentication
-- **Parameters**:
-  - `clientId`: OAuth client ID
-  - `redirectUri`: Application redirect URI
-
-#### User Details
-- **Endpoint**: `GET /api/v2/users/me`
-- **Purpose**: Fetch current user information
-- **Used In**: `startGCSDKs.js`
-
-#### Conversation Details
-- **Endpoint**: `GET /api/v2/conversations/callbacks/{conversationId}`
-- **Purpose**: Fetch conversation participant details
-- **Parameters**:
-  - `conversationId`: Active conversation identifier
-- **Response Data Used**:
-  - Customer participant details
-  - Queue ID
-  - External contact ID
-
-#### Call Initiation
-- **Endpoint**: `POST /api/v2/conversations/calls`
-- **Purpose**: Initiate outbound call
-- **Parameters**:
-  ```json
-  {
-    "phoneNumber": "string",
-    "callFromQueueId": "string",
-    "externalContactId": "string",
-    "label": "string"
-  }
-  ```
-
-### 3. Custom API Endpoints
-
-#### Get Active Vet
-- **Endpoint**: `GET /api/getActiveVet`
-- **Purpose**: Fetch current on-call veterinarian details
-- **Integration**: AWS Lambda function
-- **DynamoDB Table**: GC_TAS_ROTA_Demo
-- **Parameters**:
-  - `datetime`: ISO timestamp
-- **Headers**:
-  - `X-Api-Key`: AWS API authentication
-  - `Content-Type`: application/json
-- **Lambda Function**:
-  - Queries DynamoDB based on current datetime
-  - Processes and formats veterinarian data
-  - Implements error handling
-  - Returns formatted response
-
-#### Get Configuration
-- **Endpoint**: `GET /api/getConfig`
-- **Purpose**: Fetch application configuration
-- **Response**:
-  ```json
-  {
-    "clientId": "string"
-  }
-  ```
-
-## Application Flow
-
-1. **Initialization**
-   - Load application configuration
-   - Initialize Genesys Cloud SDKs
-   - Authenticate user
-   - Extract conversation ID from URL
-
-2. **Data Gathering**
-   - Fetch conversation details from Genesys Cloud
-   - Get current veterinarian details from AWS Lambda via API Gateway
-   - Update UI with gathered information
-
-3. **Call Initiation**
-   - User clicks "Dial" button
-   - Application validates destination number
-   - Initiates call via Genesys Cloud API
-   - Displays success/failure message
-
-## Environment Variables
-
-- `GC_OAUTH_CLIENT_ID`: Genesys Cloud OAuth client ID
-- `AWS_API_ENDPOINT`: AWS API Gateway endpoint
-- `AWS_API_KEY`: AWS API authentication key
-
-## Security Considerations
-
-1. **API Authentication**
-   - Genesys Cloud OAuth 2.0 Implicit Grant
-   - AWS API Key authentication
-   - Lambda execution role permissions
-   - DynamoDB table access controls
-   - Environment variable protection
-
-2. **Data Protection**
-   - No sensitive data storage in localStorage
-   - Minimal data persistence
-   - Secure communication protocols
-   - Encrypted data transmission
-
-## Error Handling
-
-The application implements comprehensive error handling:
-- API call failures
-- Lambda function errors
-- DynamoDB query issues
-- Missing conversation IDs
-- Invalid veterinarian data
-- Network connectivity issues
-
-## Logging
-
-Extensive logging is implemented throughout the application:
-- API call tracking
-- Lambda function execution logs
-- DynamoDB query monitoring
-- Error logging
-- User action logging
-- State changes
-- All logs are prefixed with "TAS Vet ROTA Dialer" for easy filtering
+*   `/api/getConfig.js`: Returns configuration parameters like `clientId` and `redirectUri` from environment variables.
+*   `/api/getConversationDetails.js`: Fetches detailed information about a specific conversation using the Genesys Cloud Conversations API (`getAnalyticsConversationDetails`).
+*   `/api/getExternalContactSessions.js`: Retrieves recent sessions for a given external contact using the Genesys Cloud Journey API (`getExternalcontactsContactJourneySessions`).
+*   `/api/getTranscriptUrl.js`:  Gets a pre-signed S3 URL for the transcript of a specific communication within a conversation using the Genesys Cloud Speech and Text Analytics API (`getSpeechandtextanalyticsConversationCommunicationTranscripturl`).
+*   `/api/getConversationSummary.js`: Retrieves the summary of a conversation using the Genesys Cloud Conversations API (`getConversationSummaries`).
