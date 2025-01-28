@@ -99,26 +99,47 @@ async function fetchConversationSummary(conversationId) {
 }
 
 
-function processTranscript(transcriptJson) {
-    if (!transcriptJson || !transcriptJson.transcripts || transcriptJson.transcripts.length === 0 || !transcriptJson.transcripts[0].phrases) {
+function processTranscript(transcriptJson, mediaType) {
+    if (!transcriptJson || !transcriptJson.transcripts || transcriptJson.transcripts.length === 0) {
         return "<p>No transcript available.</p>";
     }
 
-    const phrases = transcriptJson.transcripts[0].phrases;
     let transcriptHTML = '';
-    let currentParticipant = null;
 
-    phrases.forEach(phrase => {
-        const participantPurpose = phrase.participantPurpose || 'unknown';
-        const text = phrase.text;
+    if (mediaType === 'Voice' || mediaType === 'Message') {
+        for (const transcript of transcriptJson.transcripts) {
+            if (transcript.phrases && transcript.phrases.length > 0) {
+                let currentParticipant = null;
+                for (const phrase of transcript.phrases) {
+                    const participantPurpose = phrase.participantPurpose || 'unknown';
+                    const text = phrase.text;
 
-        if (participantPurpose !== currentParticipant) {
-            transcriptHTML += `<p><strong>${participantPurpose.toUpperCase()}:</strong> ${text}</p>`;
-            currentParticipant = participantPurpose;
-        } else {
-            transcriptHTML += `<p>${text}</p>`;
+                    if (participantPurpose !== currentParticipant) {
+                        transcriptHTML += `<p><strong>${participantPurpose.toUpperCase()}:</strong> ${text}</p>`;
+                        currentParticipant = participantPurpose;
+                    } else {
+                        transcriptHTML += `<p>${text}</p>`;
+                    }
+                }
+            }
         }
-    });
+    } else if (mediaType === 'Email') {
+        const transcript = transcriptJson.transcripts[0]; // Assuming only one transcript for email
+        if (transcript.phrases && transcript.phrases.length > 0) {
+            for (const phrase of transcript.phrases) {
+                const type = phrase.type || 'unknown';
+                const text = phrase.text;
+                transcriptHTML += `<p><strong>${type.toUpperCase()}:</strong> ${text}</p>`;
+            }
+        }
+    } else {
+        return "<p>Unsupported media type for transcription.</p>";
+    }
+
+    if (!transcriptHTML) {
+        return "<p>No transcript available for this media type.</p>";
+    }
+
     return transcriptHTML;
 }
 
@@ -196,7 +217,7 @@ async function displayConversationHistory(sessionsByType) {
                                 const transcriptUrlData = await fetchTranscriptUrl(session.id, customerCommunicationIdForTranscript);
                                 if (transcriptUrlData) {
                                     const transcriptData = await fetchTranscriptData(transcriptUrlData);
-                                    const transcriptHTML = processTranscript(transcriptData);
+                                    const transcriptHTML = processTranscript(transcriptData, session.mediaType);
                                     transcriptContent.innerHTML = transcriptHTML;
                                 } else {
                                     transcriptContent.innerHTML = '<p>No transcriptions available.</p>';
