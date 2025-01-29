@@ -270,7 +270,8 @@ async function displayConversationHistory(sessionsByType) {
     for (const mediaType in sessionsByType) {
         console.log('Processing mediaType:', mediaType, sessionsByType[mediaType]);
         const mediaTypeSection = document.createElement('div');
-        mediaTypeSection.classList.add('media-type-section', 'collapsed');
+        mediaTypeSection.classList.add('media-type-section'); // Removed 'collapsed' class here
+        mediaTypeSection.classList.add('collapsed'); // Added 'collapsed' back, but after media-type-section to ensure correct order
 
         const mediaTypeHeader = document.createElement('h4');
         mediaTypeHeader.textContent = `${mediaType} Conversations`;
