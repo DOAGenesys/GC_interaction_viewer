@@ -218,7 +218,7 @@ body {
 }
 
 .detail-section.collapsed .section-content {
-    display: none !important; /* Important is added here */
+    display: none; /* Reverted to simpler rule */
 }
 
 .section-header {
