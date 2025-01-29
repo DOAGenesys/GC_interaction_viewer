@@ -121,7 +121,7 @@ body {
     box-shadow: 2px 2px 7px var(--box-shadow-color);
 }
 
-.media-type-section.collapsed > *:not(.media-type-header-container) {
+.media-type-section.collapsed > ul {
     display: none;
 }
 
