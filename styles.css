@@ -1,3 +1,5 @@
+/* styles.css - Updated for Unicode Icons */
+
 :root {
     --primary-color: #007bff;
     --primary-color-dark: #0056b3;
@@ -77,6 +79,8 @@ body {
     margin-right: 15px;
     font-size: 1.5em;
     color: var(--primary-color);
+    display: inline-block; /* Ensure icon takes space */
+    line-height: 1; /* Vertically align with text */
 }
 
 
@@ -238,31 +242,35 @@ body {
     background-color: #f0f0f0;
 }
 
-.section-header i.section-detail-icon {
+.section-header .section-detail-icon {
     margin-right: 10px;
     color: var(--primary-color);
+    display: inline-block; /* Ensure icon takes space */
+    line-height: 1; /* Vertically align with text */
 }
 
-.section-header i.expand-icon,
-.section-header i.collapse-icon {
+.section-header .expand-icon,
+.section-header .collapse-icon {
     margin-left: 10px;
     font-size: 0.8em;
     color: var(--secondary-color);
+    display: inline-block; /* Ensure icon takes space */
+    line-height: 1; /* Vertically align with text */
 }
 
-.section-header i.expand-icon {
+.section-header .expand-icon {
     display: inline;
 }
 
-.section-header i.collapse-icon {
+.section-header .collapse-icon {
     display: none;
 }
 
-.detail-section:not(.collapsed) .section-header i.expand-icon {
+.detail-section:not(.collapsed) .section-header .expand-icon {
     display: none;
 }
 
-.detail-section:not(.collapsed) .section-header i.collapse-icon {
+.detail-section:not(.collapsed) .section-header .collapse-icon {
     display: inline;
 }
 
