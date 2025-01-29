@@ -352,6 +352,14 @@ async function displayConversationHistory(sessionsByType) {
                 `;
                 sessionItem.appendChild(sessionHeader);
 
+                // Prevent current tab navigation
+                const conversationIdLink = sessionItem.querySelector('.conversation-id-link');
+                conversationIdLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default navigation in current tab
+                    window.open(conversationIdLink.href, '_blank'); // Still open in new tab
+                });
+
+
                 const detailsDiv = document.createElement('div');
                 detailsDiv.classList.add('session-details');
 
