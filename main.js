@@ -1,3 +1,4 @@
+// main.js - Updated to remove Font Awesome and use Unicode/Text icons
 let config = null;
 let platformClient = null;
 let conversationsApi = null;
@@ -247,7 +248,7 @@ function displayLoading(sectionContent) {
 
 function displayErrorMessage(message) {
     const historyByTypeDiv = document.getElementById('historyByType');
-    historyByTypeDiv.innerHTML = `<div class="error-message"><i class="fas fa-exclamation-triangle error-icon"></i> ${message}</div>`;
+    historyByTypeDiv.innerHTML = `<div class="error-message">⚠ ${message}</div>`; // Replaced icon
     historyByTypeDiv.style.display = 'block';
 }
 
@@ -258,7 +259,7 @@ async function displayConversationHistory(sessionsByType) {
     historyByTypeDiv.innerHTML = '';
 
     if (Object.keys(sessionsByType).length === 0) {
-        historyByTypeDiv.innerHTML = '<div class="no-sessions-message"><i class="fas fa-inbox-empty"></i> No conversations found for the selected criteria.</div>';
+        historyByTypeDiv.innerHTML = '<div class="no-sessions-message">📥 No conversations found for the selected criteria.</div>'; // Replaced icon and text
         historyByTypeDiv.style.display = 'block';
         return;
     }
@@ -277,7 +278,7 @@ async function displayConversationHistory(sessionsByType) {
         mediaTypeHeader.textContent = `${mediaType} Conversations`;
 
         const expandButton = document.createElement('button');
-        expandButton.innerHTML = '<i class="fas fa-expand-alt"></i> Expand';
+        expandButton.innerHTML = '↗ Expand'; // Replaced icon with text
         expandButton.classList.add('expand-collapse-button', 'expand-button');
         expandButton.addEventListener('click', () => {
             mediaTypeSection.classList.remove('collapsed');
@@ -286,7 +287,7 @@ async function displayConversationHistory(sessionsByType) {
         });
 
         const collapseButton = document.createElement('button');
-        collapseButton.innerHTML = '<i class="fas fa-compress-alt"></i> Collapse';
+        collapseButton.innerHTML = '↙ Collapse'; // Replaced icon with text
         collapseButton.classList.add('expand-collapse-button', 'collapse-button');
         collapseButton.style.display = 'none';
          collapseButton.addEventListener('click', () => {
@@ -347,7 +348,7 @@ async function displayConversationHistory(sessionsByType) {
                 const transcriptionSection = document.createElement('div');
                 transcriptionSection.classList.add('detail-section');
                 const transcriptionHeader = document.createElement('h5');
-                transcriptionHeader.innerHTML = '<i class="fas fa-file-alt section-detail-icon"></i> Transcription <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
+                transcriptionHeader.innerHTML = '📄 Transcription <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>'; // Replaced icon with unicode and text
                 transcriptionHeader.classList.add('section-header');
                 transcriptionHeader.addEventListener('click', async () => {
                     console.log("Transcription header clicked for session:", session.id); // LOG: Click event start
@@ -392,7 +393,7 @@ async function displayConversationHistory(sessionsByType) {
 
                         } catch (error) {
                             console.error("Error loading transcription:", error); // LOG: Error - Overall error in try/catch
-                            transcriptContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading transcription: ${error.message}</div>`;
+                            transcriptContent.innerHTML = `<div class="error-message-inline">⚠ Error loading transcription: ${error.message}</div>`; // Replaced icon
                         }
                     }
                 });
@@ -405,7 +406,7 @@ async function displayConversationHistory(sessionsByType) {
                 const summarySection = document.createElement('div');
                 summarySection.classList.add('detail-section');
                 const summaryHeader = document.createElement('h5');
-                summaryHeader.innerHTML = '<i class="fas fa-clipboard-check section-detail-icon"></i> Summary <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
+                summaryHeader.innerHTML = 'Summary <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>'; // Replaced icon with text and unicode
                 summaryHeader.classList.add('section-header');
 
                 summaryHeader.addEventListener('click', async () => {
@@ -441,7 +442,7 @@ async function displayConversationHistory(sessionsByType) {
                             }
                         } catch (error) {
                             console.error("Error loading summary:", error); // LOG: Error - Overall error in try/catch
-                            summaryContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading summary: ${error.message}</div>`;
+                            summaryContent.innerHTML = `<div class="error-message-inline">⚠ Error loading summary: ${error.message}</div>`; // Replaced icon
                         }
                     }
                 });
@@ -454,7 +455,7 @@ async function displayConversationHistory(sessionsByType) {
                 const analyticsSection = document.createElement('div');
                 analyticsSection.classList.add('detail-section');
                 const analyticsHeader = document.createElement('h5');
-                analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
+                analyticsHeader.innerHTML = 'Analytics <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>'; // Replaced icon with text and unicode
                 analyticsHeader.classList.add('section-header');
 
                 analyticsHeader.addEventListener('click', async () => {
@@ -480,7 +481,7 @@ async function displayConversationHistory(sessionsByType) {
                             }
                         } catch (error) {
                             console.error("Error loading analytics:", error); // LOG: Error - Overall error in try/catch
-                            analyticsContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading analytics: ${error.message}</div>`;
+                            analyticsContent.innerHTML = `<div class="error-message-inline">⚠ Error loading analytics: ${error.message}</div>`; // Replaced icon
                         }
                     }
                 });
