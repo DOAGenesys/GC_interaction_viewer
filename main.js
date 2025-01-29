@@ -345,7 +345,7 @@ async function displayConversationHistory(sessionsByType) {
                 detailsDiv.classList.add('session-details');
 
                 const transcriptionSection = document.createElement('div');
-                transcriptionSection.classList.add('detail-section', 'collapsed'); // Ensure detail sections are collapsed initially
+                transcriptionSection.classList.add('detail-section'); // Removed 'collapsed' class
                 const transcriptionHeader = document.createElement('h5');
                 transcriptionHeader.innerHTML = '<i class="fas fa-file-alt section-detail-icon"></i> Transcription <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 transcriptionHeader.classList.add('section-header');
@@ -392,7 +392,7 @@ async function displayConversationHistory(sessionsByType) {
 
 
                 const summarySection = document.createElement('div');
-                summarySection.classList.add('detail-section', 'collapsed'); // Ensure detail sections are collapsed initially
+                summarySection.classList.add('detail-section'); // Removed 'collapsed' class
                 const summaryHeader = document.createElement('h5');
                 summaryHeader.innerHTML = '<i class="fas fa-clipboard-check section-detail-icon"></i> Summary <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 summaryHeader.classList.add('section-header');
@@ -436,7 +436,7 @@ async function displayConversationHistory(sessionsByType) {
 
 
                 const analyticsSection = document.createElement('div');
-                analyticsSection.classList.add('detail-section', 'collapsed'); // Ensure detail sections are collapsed initially
+                analyticsSection.classList.add('detail-section'); // Removed 'collapsed' class
                 const analyticsHeader = document.createElement('h5');
                 analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 analyticsHeader.classList.add('section-header');
