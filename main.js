@@ -345,20 +345,25 @@ async function displayConversationHistory(sessionsByType) {
                 detailsDiv.classList.add('session-details');
 
                 const transcriptionSection = document.createElement('div');
-                transcriptionSection.classList.add('detail-section'); // Removed 'collapsed' class
+                transcriptionSection.classList.add('detail-section');
                 const transcriptionHeader = document.createElement('h5');
                 transcriptionHeader.innerHTML = '<i class="fas fa-file-alt section-detail-icon"></i> Transcription <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 transcriptionHeader.classList.add('section-header');
                 transcriptionHeader.addEventListener('click', async () => {
+                    console.log("Transcription header clicked for session:", session.id); // LOG: Click event start
                     transcriptionSection.classList.toggle('collapsed');
                     const sectionContent = transcriptionSection.querySelector('.section-content');
                     if (!transcriptionSection.dataset.transcriptLoaded) {
-                        console.log("Loading transcript for session:", session.id, transcriptionSection.dataset.transcriptLoaded);
+                        console.log("Transcript not loaded yet, proceeding to load for session:", session.id); // LOG: Data load check
                         transcriptionSection.dataset.transcriptLoaded = 'true';
                         displayLoading(sectionContent);
+                        transcriptionContent.innerHTML = '<p>Loading Transcription...</p>'; // Placeholder text
 
                         try {
+                            console.log("Fetching conversation details for transcript: ", session.id); // LOG: API Call - Step 1
                             const conversationDetailsForTranscript = await fetchConversationDetails(session.id);
+                            console.log("Conversation details fetched successfully for transcript:", session.id, conversationDetailsForTranscript); // LOG: API Call - Step 1 Success
+
                             let customerCommunicationIdForTranscript = null;
                             const customerParticipantForTranscript = conversationDetailsForTranscript.participants.find(p => p.purpose === 'customer' || p.purpose === 'external');
                             if (customerParticipantForTranscript && customerParticipantForTranscript.sessions && customerParticipantForTranscript.sessions.length > 0) {
@@ -366,21 +371,27 @@ async function displayConversationHistory(sessionsByType) {
                             }
 
                             if (customerCommunicationIdForTranscript) {
+                                console.log("Customer communication ID found:", customerCommunicationIdForTranscript, "Fetching transcript URL for conversation:", session.id, "communication:", customerCommunicationIdForTranscript); // LOG: API Call - Step 2
                                 const transcriptUrlData = await fetchTranscriptUrl(session.id, customerCommunicationIdForTranscript);
+                                console.log("Transcript URL data fetched:", transcriptUrlData); // LOG: API Call - Step 2 Success
                                 if (transcriptUrlData) {
+                                    console.log("Transcript URL available:", transcriptUrlData.url, "Fetching transcript data..."); // LOG: API Call - Step 3
                                     const transcriptData = await fetchTranscriptData(transcriptUrlData);
+                                    console.log("Transcript data fetched successfully:", transcriptData); // LOG: API Call - Step 3 Success
                                     const transcriptHTML = processTranscript(transcriptData, session.mediaType);
                                     transcriptContent.innerHTML = transcriptHTML;
-                                    console.log("Transcript HTML content:", transcriptHTML);
+                                    console.log("Transcript HTML content rendered."); // LOG: Render success
                                 } else {
                                     transcriptContent.innerHTML = '<p>No transcriptions available for this conversation.</p>';
+                                    console.warn("No transcript URL data returned for conversation:", session.id, "communication:", customerCommunicationIdForTranscript); // LOG: API Response - No data
                                 }
                             } else {
                                 transcriptContent.innerHTML = '<p>Customer session ID not found, cannot load transcript.</p>';
+                                console.warn("Customer session ID not found for conversation:", session.id); // LOG: Data Issue - No customer session ID
                             }
 
                         } catch (error) {
-                            console.error("Error loading transcription:", error);
+                            console.error("Error loading transcription:", error); // LOG: Error - Overall error in try/catch
                             transcriptContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading transcription: ${error.message}</div>`;
                         }
                     }
@@ -392,21 +403,25 @@ async function displayConversationHistory(sessionsByType) {
 
 
                 const summarySection = document.createElement('div');
-                summarySection.classList.add('detail-section'); // Removed 'collapsed' class
+                summarySection.classList.add('detail-section');
                 const summaryHeader = document.createElement('h5');
                 summaryHeader.innerHTML = '<i class="fas fa-clipboard-check section-detail-icon"></i> Summary <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 summaryHeader.classList.add('section-header');
 
                 summaryHeader.addEventListener('click', async () => {
+                    console.log("Summary header clicked for session:", session.id); // LOG: Click event start
                     summarySection.classList.toggle('collapsed');
                     const sectionContent = summarySection.querySelector('.section-content');
                     if (!summarySection.dataset.summaryLoaded) {
-                        console.log("Loading summary for session:", session.id, summarySection.dataset.summaryLoaded);
+                        console.log("Summary not loaded yet, proceeding to load for session:", session.id); // LOG: Data load check
                         summarySection.dataset.summaryLoaded = 'true';
                         displayLoading(sectionContent);
+                        summaryContent.innerHTML = '<p>Loading Summary...</p>'; // Placeholder text
 
                         try {
+                            console.log("Fetching conversation summary for session:", session.id); // LOG: API Call
                             const summaryData = await fetchConversationSummary(session.id);
+                            console.log("Summary data fetched:", summaryData); // LOG: API Call Success
                             if (summaryData && summaryData.summary) {
                                 const summaryText = summaryData.summary.text ? `<p><strong>Summary:</strong> ${summaryData.summary.text}</p>` : '';
                                 const reasonText = summaryData.summary.reason && summaryData.summary.reason.text ? `<p><strong>Reason:</strong> ${summaryData.summary.reason.text}</p>` : '';
@@ -419,12 +434,13 @@ async function displayConversationHistory(sessionsByType) {
                                     ${followupText}
                                     ${resolutionText}
                                 `;
-                                console.log("Summary HTML content:", summaryContent.innerHTML);
+                                console.log("Summary HTML content rendered."); // LOG: Render success
                             } else {
                                 summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
+                                console.warn("No summary data returned for conversation:", session.id); // LOG: API Response - No data
                             }
                         } catch (error) {
-                            console.error("Error loading summary:", error);
+                            console.error("Error loading summary:", error); // LOG: Error - Overall error in try/catch
                             summaryContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading summary: ${error.message}</div>`;
                         }
                     }
@@ -436,29 +452,34 @@ async function displayConversationHistory(sessionsByType) {
 
 
                 const analyticsSection = document.createElement('div');
-                analyticsSection.classList.add('detail-section'); // Removed 'collapsed' class
+                analyticsSection.classList.add('detail-section');
                 const analyticsHeader = document.createElement('h5');
                 analyticsHeader.innerHTML = '<i class="fas fa-chart-bar section-detail-icon"></i> Analytics <i class="fas fa-chevron-down expand-icon"></i><i class="fas fa-chevron-up collapse-icon"></i>';
                 analyticsHeader.classList.add('section-header');
 
                 analyticsHeader.addEventListener('click', async () => {
+                    console.log("Analytics header clicked for session:", session.id); // LOG: Click event start
                     analyticsSection.classList.toggle('collapsed');
                     const sectionContent = analyticsSection.querySelector('.section-content');
                     if (!analyticsSection.dataset.analyticsLoaded) {
-                        console.log("Loading analytics for session:", session.id, analyticsSection.dataset.analyticsLoaded);
+                        console.log("Analytics not loaded yet, proceeding to load for session:", session.id); // LOG: Data load check
                         analyticsSection.dataset.analyticsLoaded = 'true';
                         displayLoading(sectionContent);
+                        analyticsContent.innerHTML = '<p>Loading Analytics...</p>'; // Placeholder text
                         try {
+                            console.log("Fetching conversation analytics for session:", session.id); // LOG: API Call
                             const analyticsData = await fetchConversationAnalytics(session.id);
+                            console.log("Analytics data fetched:", analyticsData); // LOG: API Call Success
                             if (analyticsData) {
                                 const analyticsDisplayHTML = displayConversationAnalytics(analyticsData);
                                 analyticsContent.innerHTML = `<div class="analytics-grid">${analyticsDisplayHTML}</div>`;
-                                console.log("Analytics HTML content:", analyticsDisplayHTML);
+                                console.log("Analytics HTML content rendered."); // LOG: Render success
                             } else {
                                 analyticsContent.innerHTML = '<p>No analytics data available for this conversation.</p>';
+                                console.warn("No analytics data returned for conversation:", session.id); // LOG: API Response - No data
                             }
                         } catch (error) {
-                            console.error("Error loading analytics:", error);
+                            console.error("Error loading analytics:", error); // LOG: Error - Overall error in try/catch
                             analyticsContent.innerHTML = `<div class="error-message-inline"><i class="fas fa-exclamation-triangle error-icon"></i> Error loading analytics: ${error.message}</div>`;
                         }
                     }
