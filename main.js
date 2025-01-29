@@ -1,4 +1,3 @@
-
 let config = null;
 let platformClient = null;
 let conversationsApi = null;
@@ -6,7 +5,34 @@ let journeyApi = null;
 let speechTextAnalyticsApi = null;
 let allSessions = [];
 let relevantSessions = [];
+const MAX_RETRIES = 3;
 
+async function callApi(apiFunction, apiArgs, retryCount = 0) {
+    try {
+        const response = await apiFunction(...apiArgs);
+        return response;
+    } catch (error) {
+        if (error.status === 429 || error.status === 502 || error.status === 503 || error.status === 504) {
+            if (retryCount < MAX_RETRIES) {
+                let retryAfter = 0;
+                if (error.status === 429 && error.headers && error.headers['retry-after']) {
+                    retryAfter = parseInt(error.headers['retry-after'], 10);
+                } else {
+                    const backoffTimes = [3, 9, 27];
+                    retryAfter = backoffTimes[retryCount] || 27;
+                }
+                console.warn(`Rate limit encountered, retrying after ${retryAfter} seconds. Retry count: ${retryCount + 1}`);
+                await new Promise(resolve => setTimeout(resolve, retryAfter * 1000));
+                return callApi(apiFunction, apiArgs, retryCount + 1);
+            } else {
+                console.error(`Max retries reached for API call after rate limiting.`, error);
+                throw error;
+            }
+        } else {
+            throw error;
+        }
+    }
+}
 
 async function getConfig() {
     try {
@@ -34,7 +60,7 @@ function getConversationId() {
 
 async function fetchConversationDetails(conversationId) {
     try {
-        const conversationDetails = await conversationsApi.getAnalyticsConversationDetails(conversationId);
+        const conversationDetails = await callApi(conversationsApi.getAnalyticsConversationDetails.bind(conversationsApi), [conversationId]);
         return conversationDetails;
     } catch (error) {
         console.error(`GC Interaction Viewer - Failed to fetch conversation details:`, error);
@@ -48,7 +74,7 @@ async function fetchExternalContactSessions(contactId) {
         "includeMerged": true
     };
     try {
-        const sessionsData = await journeyApi.getExternalcontactsContactJourneySessions(contactId, opts);
+        const sessionsData = await callApi(journeyApi.getExternalcontactsContactJourneySessions.bind(journeyApi), [contactId, opts]);
         return sessionsData;
     } catch (error) {
         console.error(`GC Interaction Viewer - Failed to fetch external contact sessions:`, error);
@@ -59,7 +85,7 @@ async function fetchExternalContactSessions(contactId) {
 
 async function fetchTranscriptUrl(conversationId, communicationId) {
     try {
-        const transcriptUrlData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl(conversationId, communicationId);
+        const transcriptUrlData = await callApi(speechTextAnalyticsApi.getSpeechandtextanalyticsConversationCommunicationTranscripturl.bind(speechTextAnalyticsApi), [conversationId, communicationId]);
         return transcriptUrlData;
     } catch (error) {
         if (error.status === 404) {
@@ -93,7 +119,7 @@ async function fetchTranscriptData(transcriptUrl) {
 
 async function fetchConversationSummary(conversationId) {
     try {
-        const summaryData = await conversationsApi.getConversationSummaries(conversationId);
+        const summaryData = await callApi(conversationsApi.getConversationSummaries.bind(conversationsApi), [conversationId]);
         return summaryData;
     } catch (error) {
         if (error.status === 404) {
@@ -107,7 +133,7 @@ async function fetchConversationSummary(conversationId) {
 
 async function fetchConversationAnalytics(conversationId) {
     try {
-        const analyticsData = await speechTextAnalyticsApi.getSpeechandtextanalyticsConversation(conversationId);
+        const analyticsData = await callApi(speechTextAnalyticsApi.getSpeechandtextanalyticsConversation.bind(speechTextAnalyticsApi), [conversationId]);
         return analyticsData;
     } catch (error) {
         if (error.status === 404) {
