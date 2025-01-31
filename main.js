@@ -267,7 +267,6 @@ function displayErrorMessage(message) {
     historyByTypeDiv.style.display = 'block';
 }
 
-
 async function displayConversationHistory(sessionsByType) {
     const historyByTypeDiv = document.getElementById('historyByType');
     historyByTypeDiv.innerHTML = '';
@@ -433,18 +432,27 @@ async function displayConversationHistory(sessionsByType) {
 
                         try {
                             const summaryData = await fetchConversationSummary(session.id);
-                            if (summaryData && summaryData.summary) {
-                                const summaryText = summaryData.summary.text ? `<p><strong>Summary:</strong> ${summaryData.summary.text}</p>` : '';
-                                const reasonText = summaryData.summary.reason && summaryData.summary.reason.text ? `<p><strong>Reason:</strong> ${summaryData.summary.reason.text}</p>` : '';
-                                const followupText = summaryData.summary.followup && summaryData.summary.followup.text ? `<p><strong>Follow up:</strong> ${summaryData.summary.followup.text}</p>` : '';
-                                const resolutionText = summaryData.summary.resolution && summaryData.summary.resolution.text ? `<p><strong>Resolution:</strong> ${summaryData.summary.resolution.text}</p>` : '';
+                            if (summaryData && summaryData.sessionSummaries && Array.isArray(summaryData.sessionSummaries) && summaryData.sessionSummaries.length > 0) {
+                                let allSummariesHTML = '';
+                                summaryData.sessionSummaries.forEach((sessionSummary, index) => {
+                                    const summaryText = sessionSummary.text ? `<p><strong>Summary:</strong> ${sessionSummary.text}</p>` : '';
+                                    const reasonText = sessionSummary.reason && sessionSummary.reason.text ? `<p><strong>Reason:</strong> ${sessionSummary.reason.text}</p>` : '';
+                                    const followupText = sessionSummary.followup && sessionSummary.followup.text ? `<p><strong>Follow up:</strong> ${sessionSummary.followup.text}</p>` : '';
+                                    const resolutionText = sessionSummary.resolution && sessionSummary.resolution.text ? `<p><strong>Resolution:</strong> ${sessionSummary.resolution.text}</p>` : '';
 
-                                summaryContent.innerHTML = `
-                                    ${summaryText}
-                                    ${reasonText}
-                                    ${followupText}
-                                    ${resolutionText}
-                                `;
+                                    allSummariesHTML += `
+                                        <div class="session-summary">
+                                            <h5>Summary ${index + 1}</h5>
+                                            ${summaryText}
+                                            ${reasonText}
+                                            ${followupText}
+                                            ${resolutionText}
+                                        </div>
+                                        <hr/>
+                                    `;
+                                });
+                                summaryContent.innerHTML = allSummariesHTML;
+
                             } else {
                                 summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
                             }
@@ -499,6 +507,7 @@ async function displayConversationHistory(sessionsByType) {
     }
     historyByTypeDiv.style.display = 'block';
 }
+
 
 async function initialize() {
     try {
