@@ -409,3 +409,31 @@ body {
 .history-by-type {
     display: none;
 }
+
+.session-summary {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.session-summary h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: var(--primary-color-dark);
+    font-size: 1.1em;
+}
+
+.session-summary p {
+    margin-bottom: 8px;
+}
+
+.session-summary p:last-child {
+    margin-bottom: 0;
+}
+
+.session-summary strong {
+    font-weight: 500;
+    color: var(--text-color-dark);
+}
