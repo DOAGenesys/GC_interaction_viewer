@@ -6,6 +6,43 @@ let speechTextAnalyticsApi = null;
 let allSessions = [];
 let relevantSessions = [];
 const MAX_RETRIES = 3;
+const INITIAL_QUERY_STORAGE_KEY = 'gcInteractionViewer:initialQuery';
+
+// Preserve the interaction context across the OAuth implicit grant redirect so the conversationId survives when Genesys removes query params.
+function persistInitialQueryParams() {
+    const search = window.location.search;
+    if (!search) {
+        return;
+    }
+    const params = new URLSearchParams(search);
+    if (params.has('conversationId')) {
+        sessionStorage.setItem(INITIAL_QUERY_STORAGE_KEY, search.replace(/^\?/, ''));
+    }
+}
+
+function restoreQueryParamsIfMissing() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('conversationId')) {
+        return;
+    }
+
+    const storedQuery = sessionStorage.getItem(INITIAL_QUERY_STORAGE_KEY);
+    if (!storedQuery) {
+        return;
+    }
+
+    const hash = window.location.hash || '';
+    const isOAuthCallback = hash.includes('access_token=') || hash.includes('error=') || hash.includes('state=');
+    if (!isOAuthCallback) {
+        return;
+    }
+
+    const newUrl = `${window.location.pathname}?${storedQuery}${hash}`;
+    window.history.replaceState(null, '', newUrl);
+}
+
+persistInitialQueryParams();
+restoreQueryParamsIfMissing();
 
 async function callApi(apiFunction, apiArgs, retryCount = 0) {
     try {
