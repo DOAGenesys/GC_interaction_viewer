@@ -1,22 +1,22 @@
 :root {
-    --page-bg: #030712;
-    --panel: rgba(255, 255, 255, 0.04);
-    --panel-strong: rgba(255, 255, 255, 0.08);
-    --surface: rgba(255, 255, 255, 0.06);
-    --border: rgba(255, 255, 255, 0.16);
-    --border-soft: rgba(255, 255, 255, 0.08);
-    --text-primary: #e7edf9;
-    --text-secondary: #9fb2d4;
-    --accent: #5de1d1;
-    --accent-strong: #7c7dff;
-    --danger: #ff6b6b;
-    --warning: #f6c344;
-    --success: #4ad991;
-    --shadow-soft: 0 22px 65px rgba(3, 7, 18, 0.65);
-    --shadow-strong: 0 40px 120px rgba(3, 7, 18, 0.85);
+    --page-bg: #f5f7fb;
+    --panel: #ffffff;
+    --panel-strong: #f0f4fb;
+    --surface: #ffffff;
+    --border: #d7deea;
+    --border-soft: #e4e9f2;
+    --text-primary: #0f172a;
+    --text-secondary: #4b5565;
+    --accent: #1c6fe8;
+    --accent-strong: #2f80ed;
+    --danger: #d92d20;
+    --warning: #b46a00;
+    --success: #15803d;
+    --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.12);
+    --shadow-strong: 0 28px 80px rgba(15, 23, 42, 0.16);
     --radius-lg: 18px;
     --radius-md: 12px;
-    --blur: 18px;
+    --blur: 14px;
 }
 
 * {
@@ -26,9 +26,9 @@
 body {
     margin: 0;
     padding: 0;
-    background: radial-gradient(circle at 12% 20%, rgba(124, 125, 255, 0.13), transparent 32%),
-        radial-gradient(circle at 80% 10%, rgba(93, 225, 209, 0.18), transparent 30%),
-        radial-gradient(circle at 30% 70%, rgba(93, 225, 209, 0.12), transparent 28%),
+    background: radial-gradient(circle at 18% 20%, rgba(46, 126, 237, 0.15), transparent 28%),
+        radial-gradient(circle at 78% 12%, rgba(255, 198, 120, 0.18), transparent 32%),
+        radial-gradient(circle at 40% 65%, rgba(28, 111, 232, 0.12), transparent 30%),
         var(--page-bg);
     color: var(--text-primary);
     font-family: 'Space Grotesk', 'Manrope', system-ui, -apple-system, sans-serif;
@@ -49,17 +49,17 @@ a {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    filter: blur(80px);
-    opacity: 0.45;
+    filter: blur(90px);
+    opacity: 0.4;
     transform: translateZ(0);
 }
 
 .ambient-layer-1 {
-    background: radial-gradient(circle at 25% 40%, rgba(93, 225, 209, 0.35), transparent 45%);
+    background: radial-gradient(circle at 30% 40%, rgba(46, 126, 237, 0.25), transparent 46%);
 }
 
 .ambient-layer-2 {
-    background: radial-gradient(circle at 80% 20%, rgba(124, 125, 255, 0.35), transparent 46%);
+    background: radial-gradient(circle at 85% 22%, rgba(255, 198, 120, 0.26), transparent 48%);
 }
 
 .app-shell {
@@ -76,7 +76,7 @@ a {
 }
 
 .hero {
-    background: linear-gradient(140deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.82));
     border: 1px solid var(--border);
     border-radius: 22px;
     padding: 32px;
@@ -93,7 +93,7 @@ a {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(120% 90% at 80% 10%, rgba(93, 225, 209, 0.08), transparent 50%);
+    background: radial-gradient(140% 90% at 80% 10%, rgba(28, 111, 232, 0.12), transparent 50%);
     pointer-events: none;
 }
 
@@ -132,8 +132,8 @@ a {
 .chip {
     padding: 8px 12px;
     border-radius: 999px;
-    border: 1px solid var(--border-soft);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    background: rgba(28, 111, 232, 0.06);
     color: var(--text-primary);
     font-size: 12px;
     letter-spacing: 0.01em;
@@ -153,8 +153,8 @@ a {
 .summary-card {
     padding: 14px 16px;
     border-radius: 14px;
-    border: 1px solid var(--border-soft);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    background: var(--panel);
     box-shadow: var(--shadow-soft);
 }
 
@@ -179,7 +179,7 @@ a {
 }
 
 .conversation-history-section {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
     padding: 26px;
@@ -195,7 +195,7 @@ a {
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(120deg, rgba(93, 225, 209, 0.35), rgba(124, 125, 255, 0.25));
+    background: linear-gradient(120deg, rgba(28, 111, 232, 0.25), rgba(255, 198, 120, 0.35));
     mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask-composite: exclude;
@@ -244,8 +244,8 @@ a {
     gap: 8px;
     padding: 8px 12px;
     border-radius: 999px;
-    border: 1px solid rgba(93, 225, 209, 0.5);
-    background: rgba(93, 225, 209, 0.08);
+    border: 1px solid rgba(28, 111, 232, 0.35);
+    background: rgba(28, 111, 232, 0.08);
     color: var(--text-primary);
     font-weight: 600;
     letter-spacing: 0.01em;
@@ -256,7 +256,7 @@ a {
     height: 10px;
     border-radius: 50%;
     background: var(--accent);
-    box-shadow: 0 0 0 8px rgba(93, 225, 209, 0.1);
+    box-shadow: 0 0 0 8px rgba(28, 111, 232, 0.12);
 }
 
 .filter-container {
@@ -264,8 +264,8 @@ a {
     margin-bottom: 24px;
     padding: 18px 18px 12px;
     border-radius: var(--radius-md);
-    border: 1px solid var(--border-soft);
-    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    background: var(--panel);
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: 16px;
@@ -295,7 +295,7 @@ a {
     padding: 10px;
     border-radius: 10px;
     border: 1px solid var(--border);
-    background: var(--surface);
+    background: var(--panel);
     color: var(--text-primary);
     font-size: 13px;
 }
@@ -317,14 +317,14 @@ a {
 .media-type-section {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel);
     box-shadow: var(--shadow-soft);
     overflow: hidden;
     transition: border-color 0.25s ease, transform 0.2s ease;
 }
 
 .media-type-section:hover {
-    border-color: rgba(93, 225, 209, 0.45);
+    border-color: rgba(28, 111, 232, 0.35);
     transform: translateY(-2px);
 }
 
@@ -338,7 +338,7 @@ a {
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    background: linear-gradient(120deg, rgba(93, 225, 209, 0.12), rgba(124, 125, 255, 0.08));
+    background: linear-gradient(120deg, rgba(28, 111, 232, 0.1), rgba(255, 198, 120, 0.12));
     border-bottom: 1px solid var(--border-soft);
 }
 
@@ -349,9 +349,9 @@ a {
 }
 
 .expand-collapse-button {
-    background: rgba(255, 255, 255, 0.06);
+    background: #f3f6fb;
     color: var(--text-primary);
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border);
     padding: 8px 12px;
     border-radius: 10px;
     cursor: pointer;
@@ -371,8 +371,8 @@ a {
 }
 
 .expand-collapse-button:hover {
-    background: rgba(93, 225, 209, 0.12);
-    border-color: rgba(93, 225, 209, 0.4);
+    background: rgba(28, 111, 232, 0.08);
+    border-color: rgba(28, 111, 232, 0.32);
     transform: translateY(-1px);
 }
 
@@ -381,6 +381,7 @@ a {
     border-bottom: 1px solid var(--border-soft);
     position: relative;
     overflow: hidden;
+    background: linear-gradient(180deg, #ffffff, #f8fbff);
 }
 
 .session-item:last-child {
@@ -394,7 +395,7 @@ a {
     top: 18px;
     bottom: 18px;
     width: 3px;
-    background: linear-gradient(180deg, rgba(93, 225, 209, 0.8), rgba(124, 125, 255, 0.7));
+    background: linear-gradient(180deg, rgba(28, 111, 232, 0.8), rgba(255, 198, 120, 0.9));
     border-radius: 3px;
 }
 
@@ -414,14 +415,14 @@ a {
     font-size: 14px;
     padding: 6px 10px;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-soft);
+    background: #f3f6fb;
+    border: 1px solid var(--border);
     transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
 .conversation-id-link:hover {
     color: var(--accent);
-    border-color: rgba(93, 225, 209, 0.4);
+    border-color: rgba(28, 111, 232, 0.32);
     transform: translateY(-1px);
 }
 
@@ -444,15 +445,15 @@ a {
 }
 
 .detail-section {
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border);
     border-radius: 12px;
     margin-bottom: 12px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.03);
+    background: #ffffff;
 }
 
 .section-header-button {
-    background: linear-gradient(120deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    background: linear-gradient(120deg, #ffffff, #f3f6fb);
     padding: 14px 16px;
     cursor: pointer;
     display: flex;
@@ -470,11 +471,11 @@ a {
 }
 
 .section-header-button:hover {
-    background: rgba(93, 225, 209, 0.08);
+    background: rgba(28, 111, 232, 0.06);
 }
 
 .section-header-button:focus {
-    outline: 2px solid rgba(93, 225, 209, 0.5);
+    outline: 2px solid rgba(28, 111, 232, 0.35);
     outline-offset: 2px;
 }
 
@@ -504,7 +505,7 @@ a {
 
 .section-content {
     padding: 16px;
-    background: rgba(255, 255, 255, 0.02);
+    background: #ffffff;
     border-top: 1px solid var(--border-soft);
     font-size: 13px;
     color: var(--text-primary);
@@ -551,12 +552,12 @@ a {
 }
 
 .topic-tag {
-    background: rgba(93, 225, 209, 0.12);
+    background: rgba(28, 111, 232, 0.1);
     color: var(--accent);
     padding: 6px 12px;
     border-radius: 999px;
     font-size: 12px;
-    border: 1px solid rgba(93, 225, 209, 0.35);
+    border: 1px solid rgba(28, 111, 232, 0.22);
 }
 
 .analytics-grid {
@@ -566,12 +567,12 @@ a {
 }
 
 .analytics-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: #f7f9fc;
     padding: 12px;
     border-radius: 12px;
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border);
     text-align: left;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 0 0 1px #ffffff;
 }
 
 .analytics-item strong {
@@ -582,7 +583,7 @@ a {
 }
 
 .loading-spinner {
-    border: 3px solid rgba(255, 255, 255, 0.08);
+    border: 3px solid rgba(15, 23, 42, 0.08);
     border-top-color: var(--accent);
     border-radius: 50%;
     width: 28px;
@@ -616,15 +617,15 @@ a {
 }
 
 .error-message {
-    background: rgba(255, 107, 107, 0.08);
-    border-color: rgba(255, 107, 107, 0.3);
+    background: rgba(217, 45, 32, 0.08);
+    border-color: rgba(217, 45, 32, 0.3);
 }
 
 .error-message-inline {
     color: var(--text-primary);
     padding: 12px;
-    background: rgba(255, 107, 107, 0.08);
-    border: 1px solid rgba(255, 107, 107, 0.3);
+    background: rgba(217, 45, 32, 0.08);
+    border: 1px solid rgba(217, 45, 32, 0.3);
     border-radius: 10px;
     margin: 10px 0;
     text-align: left;
@@ -632,8 +633,8 @@ a {
 }
 
 .no-sessions-message {
-    background: rgba(246, 195, 68, 0.08);
-    border-color: rgba(246, 195, 68, 0.25);
+    background: rgba(180, 106, 0, 0.08);
+    border-color: rgba(180, 106, 0, 0.25);
     color: var(--warning);
 }
 
@@ -652,9 +653,9 @@ a {
 .session-summary {
     margin-bottom: 12px;
     padding: 14px;
-    border: 1px solid var(--border-soft);
+    border: 1px solid var(--border);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.02);
+    background: #f7f9fc;
 }
 
 .session-summary h5 {
@@ -674,7 +675,7 @@ a {
 }
 
 .select2-container .select2-selection--multiple {
-    background-color: var(--surface);
+    background-color: var(--panel);
     border: 1px solid var(--border);
     border-radius: 10px;
     min-height: 44px;
@@ -682,8 +683,8 @@ a {
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: rgba(93, 225, 209, 0.15);
-    border: 1px solid rgba(93, 225, 209, 0.35);
+    background-color: rgba(28, 111, 232, 0.12);
+    border: 1px solid rgba(28, 111, 232, 0.22);
     color: var(--text-primary);
     border-radius: 999px;
     padding: 4px 8px;
@@ -700,7 +701,7 @@ a {
 }
 
 .select2-dropdown {
-    background: var(--page-bg);
+    background: #ffffff;
     border: 1px solid var(--border);
     color: var(--text-primary);
 }
@@ -710,7 +711,7 @@ a {
 }
 
 .select2-results__option--highlighted.select2-results__option--selectable {
-    background: rgba(93, 225, 209, 0.15);
+    background: rgba(28, 111, 232, 0.12);
 }
 
 @media (max-width: 900px) {
