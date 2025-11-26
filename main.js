@@ -300,8 +300,8 @@ function displayLoading(sectionContent) {
 
 function displayErrorMessage(message) {
     const historyByTypeDiv = document.getElementById('historyByType');
-    historyByTypeDiv.innerHTML = `<div class="error-message">⚠ ${message}</div>`;
-    historyByTypeDiv.style.display = 'block';
+    historyByTypeDiv.innerHTML = `<div class="error-message"><span class="message-icon">!</span>${message}</div>`;
+    historyByTypeDiv.style.display = 'grid';
 }
 
 async function displayConversationHistory(sessionsByType) {
@@ -309,8 +309,8 @@ async function displayConversationHistory(sessionsByType) {
     historyByTypeDiv.innerHTML = '';
 
     if (Object.keys(sessionsByType).length === 0) {
-        historyByTypeDiv.innerHTML = '<div class="no-sessions-message">📥 No conversations found for the selected criteria.</div>';
-        historyByTypeDiv.style.display = 'block';
+        historyByTypeDiv.innerHTML = '<div class="no-sessions-message"><span class="message-icon">!</span>No conversations found for the selected criteria.</div>';
+        historyByTypeDiv.style.display = 'grid';
         return;
     }
 
@@ -327,7 +327,7 @@ async function displayConversationHistory(sessionsByType) {
         mediaTypeHeader.textContent = `${mediaType} Conversations`;
 
         const expandButton = document.createElement('button');
-        expandButton.innerHTML = '↗ Expand';
+        expandButton.innerHTML = '<span class="button-icon">+</span> Expand';
         expandButton.classList.add('expand-collapse-button', 'expand-button');
         expandButton.addEventListener('click', () => {
             mediaTypeSection.classList.remove('collapsed');
@@ -336,7 +336,7 @@ async function displayConversationHistory(sessionsByType) {
         });
 
         const collapseButton = document.createElement('button');
-        collapseButton.innerHTML = '↙ Collapse';
+        collapseButton.innerHTML = '<span class="button-icon">-</span> Collapse';
         collapseButton.classList.add('expand-collapse-button', 'collapse-button');
         collapseButton.style.display = 'none';
          collapseButton.addEventListener('click', () => {
@@ -403,7 +403,7 @@ async function displayConversationHistory(sessionsByType) {
                 transcriptionSection.classList.add('detail-section');
                 const transcriptionButton = document.createElement('button');
                 transcriptionButton.classList.add('section-header-button');
-                transcriptionButton.innerHTML = '📄 Transcription <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>';
+                transcriptionButton.innerHTML = 'Transcription <span class="expand-icon">+</span><span class="collapse-icon">-</span>';
                 const transcriptionContent = document.createElement('div');
                 transcriptionContent.classList.add('section-content');
                 transcriptionContent.style.display = 'none';
@@ -438,10 +438,10 @@ async function displayConversationHistory(sessionsByType) {
                                 }
                             } else {
                                 transcriptionContent.innerHTML = '<p>Customer session ID not found, cannot load transcript.</p>';
-                            }
+                        }
 
-                        } catch (error) {
-                            transcriptionContent.innerHTML = `<div class="error-message-inline">⚠ Error loading transcription: ${error.message}</div>`;
+                    } catch (error) {
+                            transcriptionContent.innerHTML = `<div class="error-message-inline"><span class="message-icon">!</span>Error loading transcription: ${error.message}</div>`;
                         }
                     }
                 });
@@ -451,7 +451,7 @@ async function displayConversationHistory(sessionsByType) {
                 summarySection.classList.add('detail-section');
                 const summaryButton = document.createElement('button');
                 summaryButton.classList.add('section-header-button');
-                summaryButton.innerHTML = 'Summary <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>';
+                summaryButton.innerHTML = 'Summary <span class="expand-icon">+</span><span class="collapse-icon">-</span>';
                 const summaryContent = document.createElement('div');
                 summaryContent.classList.add('section-content');
                 summaryContent.style.display = 'none';
@@ -494,7 +494,7 @@ async function displayConversationHistory(sessionsByType) {
                                 summaryContent.innerHTML = '<p>No summaries available for this conversation.</p>';
                             }
                         } catch (error) {
-                            summaryContent.innerHTML = `<div class="error-message-inline">⚠ Error loading summary: ${error.message}</div>`;
+                            summaryContent.innerHTML = `<div class="error-message-inline"><span class="message-icon">!</span>Error loading summary: ${error.message}</div>`;
                         }
                     }
                 });
@@ -504,7 +504,7 @@ async function displayConversationHistory(sessionsByType) {
                 analyticsSection.classList.add('detail-section');
                 const analyticsButton = document.createElement('button');
                 analyticsButton.classList.add('section-header-button');
-                analyticsButton.innerHTML = 'Analytics <span class="expand-icon">▼</span><span class="collapse-icon">▲</span>';
+                analyticsButton.innerHTML = 'Analytics <span class="expand-icon">+</span><span class="collapse-icon">-</span>';
                 const analyticsContent = document.createElement('div');
                 analyticsContent.classList.add('section-content');
                 analyticsContent.style.display = 'none';
@@ -529,7 +529,7 @@ async function displayConversationHistory(sessionsByType) {
                                 analyticsContent.innerHTML = '<p>No analytics data available for this conversation.</p>';
                             }
                         } catch (error) {
-                            analyticsContent.innerHTML = `<div class="error-message-inline">⚠ Error loading analytics: ${error.message}</div>`;
+                            analyticsContent.innerHTML = `<div class="error-message-inline"><span class="message-icon">!</span>Error loading analytics: ${error.message}</div>`;
                         }
                     }
                 });
@@ -542,7 +542,7 @@ async function displayConversationHistory(sessionsByType) {
         }
         historyByTypeDiv.appendChild(mediaTypeSection);
     }
-    historyByTypeDiv.style.display = 'block';
+    historyByTypeDiv.style.display = 'grid';
 }
 
 

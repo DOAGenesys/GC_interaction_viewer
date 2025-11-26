@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genesys Cloud Interaction Viewer</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -14,24 +16,66 @@
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <div class="app-container">
-        <main class="app-main">
-            <section id="conversationHistory" class="conversation-history-section">
-                <div class="section-header">
-                    <h3>Conversation History</h3>
+    <div class="ambient-layer ambient-layer-1"></div>
+    <div class="ambient-layer ambient-layer-2"></div>
+    <div class="app-shell">
+        <header class="hero">
+            <div class="hero-content">
+                <p class="hero-eyebrow">Genesys Cloud</p>
+                <h1>Interaction Viewer</h1>
+                <p class="hero-subtitle">A polished, real-time view of every interaction with transcripts, summaries, and analytics powered by live Genesys data.</p>
+                <div class="hero-chips">
+                    <span class="chip">Secure OAuth</span>
+                    <span class="chip">Conversation intelligence</span>
+                    <span class="chip">Operational clarity</span>
                 </div>
-                <div id="filter-container" class="filter-container">
-                    <label for="status-filter">Filter by Status:</label>
-                    <select id="status-filter" multiple="multiple" style="width: 100%;">
-                        <option value="all">All</option>
-                        <option value="unattended">Unattended</option>
-                        <option value="attended">Attended</option>
-                        <option value="other">Other</option>
-                    </select>
+            </div>
+            <div class="hero-summary">
+                <div class="summary-card">
+                    <p class="label">History</p>
+                    <p class="value">Complete, filterable timelines per contact</p>
                 </div>
-                <div id="historyByType" class="history-by-type" style="display: none;"></div>
-            </section>
-        </main>
+                <div class="summary-card">
+                    <p class="label">Quality</p>
+                    <p class="value">Granular transcripts, summaries, and analytics</p>
+                </div>
+                <div class="summary-card">
+                    <p class="label">Confidence</p>
+                    <p class="value">Runs directly against your Genesys environment</p>
+                </div>
+            </div>
+        </header>
+        <div class="app-container">
+            <main class="app-main">
+                <section id="conversationHistory" class="conversation-history-section">
+                    <div class="section-header">
+                        <div>
+                            <p class="eyebrow">Live insights</p>
+                            <h3>Conversation History</h3>
+                            <p class="subhead">Explore every conversation for this contact with full fidelity details.</p>
+                        </div>
+                        <div class="section-actions">
+                            <span class="live-indicator"><span class="pulse-dot"></span>Real Genesys data</span>
+                        </div>
+                    </div>
+                    <div id="filter-container" class="filter-container">
+                        <div class="filter-copy">
+                            <label for="status-filter">Filter by Status</label>
+                            <p class="hint">Target unattended, attended, or other interaction flows.</p>
+                        </div>
+                        <div class="filter-control">
+                            <select id="status-filter" multiple="multiple" style="width: 100%;">
+                                <option value="all">All</option>
+                                <option value="unattended">Unattended</option>
+                                <option value="attended">Attended</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="historyByType" class="history-by-type" style="display: none;"></div>
+                </section>
+            </main>
+        </div>
     </div>
     <script src="startGCSDKs.js"></script>
     <script src="main.js"></script>
